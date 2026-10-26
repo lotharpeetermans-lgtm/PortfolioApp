@@ -428,113 +428,162 @@ wereld_tickers = [
     "PLTR","CRM","NOW","ADBE","ORCL",
     "SNOW","DDOG","CRWD","PANW","MDB",
     "NET","TEAM","ZS","OKTA",
+    "APP","DUOL","SHOP","HUBS",
+    "DOCN","ESTC","WDAY",
 
-    # Chips
+    # Chips & Semiconductors
     "AMD","AVGO","TSM","ASML","ARM",
     "QCOM","MU","MRVL","ANET","INTC",
+    "NXPI","ADI","TXN","MCHP",
+    "AMAT","LRCX","KLAC","ONTO",
+    "MPWR","ACLS","TER",
 
-    # Financieel
+    # Financials
     "V","MA","JPM","GS","BLK",
     "MS","AXP","SCHW","KKR","BX",
+    "SPGI","MCO","CME","ICE",
+    "CB","PGR","AON","AJG",
 
-    # Gezondheid
+    # Healthcare
     "LLY","NVO","UNH","ABBV","TMO",
     "DHR","ISRG","VRTX","REGN","BSX",
+    "SYK","EW","MDT","IDXX",
+    "ZBH","HCA",
 
-    # Industrie
+    # Industrials
     "GE","GEV","ETN","PH","TT",
     "PWR","NXT","CAT","DE","HON",
+    "URI","IR","EMR","ROK",
+    "WM","JCI","FAST",
 
-    # Energie
+    # Energy
     "VST","CEG","SMR","CCJ","NEE",
     "XOM","CVX","COP","SLB","OKE",
+    "EOG","MPC","PSX","WMB",
+    "KMI","FANG",
 
-    # Consument
+    # Nuclear / Uranium
+    "SMR","OKLO","CCJ",
+    "LTBR","BWXT",
+    "UEC","UUUU","NXE",
+
+    # Consumer
     "COST","WMT","MELI","NFLX","BKNG",
     "ABNB","UBER","SPOT","TSLA","RACE",
+    "HD","LOW","CMG","MCD",
+    "NKE","LULU","SBUX",
 
-    # Europa
-    "SAP","MC.PA","SU.PA",
-    "RMS.PA","AIR.PA","BN.PA",
-    "NOVO-B.CO","DSV.CO","PRX.AS",
+    # Communication
+    "TTWO","EA","DIS",
+    "TMUS","VZ","T",
+    "ROKU",
+
+    # Defence
+    "LMT","RTX","NOC",
+    "GD","LHX","BA",
+
+    # Europe
+    "SAP",
+    "MC.PA",
+    "RMS.PA",
+    "SU.PA",
+    "AIR.PA",
+    "BN.PA",
+    "NOVO-B.CO",
+    "DSV.CO",
+    "PRX.AS",
+    "ASML.AS",
+    "ABI.BR",
+    "ARGX.BR",
+    "INGA.AS",
+    "AD.AS",
 
     # ETF's
-    "SPY","QQQ","VOO","VGT","SOXX",
-    "IWM","SMH","SCHG","XLK","IGV"
+    "SPY","QQQ","VOO",
+    "VGT","SOXX","SMH",
+    "SCHG","XLK","IGV",
+    "VUG","MTUM",
+    "QUAL","VTV",
+    "VIG","DGRO",
+    "SCHD","IWM"
 ]
 
-koopkansen = []
+@st.cache_data(ttl=86400)
+def bereken_wereldwijde_koopkansen():
 
-for ticker in wereld_tickers:
+    koopkansen = []
 
-    try:
+    for ticker in wereld_tickers:
 
-        info = yf.Ticker(ticker).info
+        try:
 
-        advies = info.get("recommendationKey")
-        koersdoel = info.get("targetMeanPrice")
-        koers = info.get("currentPrice")
+            info = yf.Ticker(ticker).info
 
-        if koers is None:
-            koers = info.get("regularMarketPrice")
+            advies = info.get("recommendationKey")
+            koersdoel = info.get("targetMeanPrice")
+            koers = info.get("currentPrice")
 
-        analisten = info.get(
-            "numberOfAnalystOpinions"
-        )
+            if koers is None:
+                koers = info.get("regularMarketPrice")
 
-        sector = info.get("sector")
+            analisten = info.get(
+                "numberOfAnalystOpinions"
+            )
 
-        if (
-            koersdoel is None
-            or koers is None
-            or koers <= 0
-        ):
-            continue
+            sector = info.get("sector")
 
-        potentieel = round(
-            ((koersdoel - koers) / koers) * 100,
-            1
-        )
+            if (
+                koersdoel is None
+                or koers is None
+                or koers <= 0
+            ):
+                continue
 
-        if advies == "strong_buy":
-            score = 100
-            advies_txt = "🟢 Sterk kopen"
+            potentieel = round(
+                ((koersdoel - koers) / koers) * 100,
+                1
+            )
 
-        elif advies == "buy":
-            score = 75
-            advies_txt = "🟢 Kopen"
+            if advies == "strong_buy":
+                score = 100
+                advies_txt = "🟢 Sterk kopen"
 
-        elif advies == "hold":
-            score = 40
-            advies_txt = "🟡 Houden"
+            elif advies == "buy":
+                score = 75
+                advies_txt = "🟢 Kopen"
 
-        else:
-            score = 0
-            advies_txt = "🔴 Verkopen"
+            elif advies == "hold":
+                score = 40
+                advies_txt = "🟡 Houden"
 
-        score += potentieel
+            else:
+                score = 0
+                advies_txt = "🔴 Verkopen"
 
-        if analisten is not None:
-            score += min(analisten, 50) / 5
+            score += potentieel
 
-        koopkansen.append({
-            "Ticker": ticker,
-            "Sector": sector,
-            "Analistenadvies": advies_txt,
-            "Analisten": analisten,
-            "Koers": koers,
-            "Koersdoel": koersdoel,
-            "Potentieel %": potentieel,
-            "Koopscore": round(score, 1),
-            "Yahoo": f"https://finance.yahoo.com/quote/{ticker}/analysis"
-        })
+            if analisten is not None:
+                score += min(analisten, 50) / 5
 
-    except Exception:
-        pass
+            koopkansen.append({
+                "Ticker": ticker,
+                "Sector": sector,
+                "Analistenadvies": advies_txt,
+                "Analisten": analisten,
+                "Koers": koers,
+                "Koersdoel": koersdoel,
+                "Potentieel %": potentieel,
+                "Koopscore": round(score, 1),
+                "Yahoo": f"https://finance.yahoo.com/quote/{ticker}/analysis"
+            })
 
-wereld_koopkansen = pd.DataFrame(
-    koopkansen
-)
+        except Exception:
+            pass
+
+    return pd.DataFrame(koopkansen)
+
+
+wereld_koopkansen = bereken_wereldwijde_koopkansen()
 
 if (
     not wereld_koopkansen.empty
@@ -560,6 +609,21 @@ else:
 # AUTOMATISCH ADVIES
 # ===================================
 
+@st.cache_data(ttl=86400)
+def haal_ticker_info(ticker):
+
+    try:
+
+        if pd.isna(ticker) or ticker == "":
+            return {}
+
+        return yf.Ticker(ticker).info
+
+    except:
+
+        return {}
+
+
 def bepaal_advies(rendement):
 
     if pd.isna(rendement):
@@ -580,16 +644,18 @@ def bepaal_advies(rendement):
     else:
         return "🔴 Winst nemen"
 
+
+@st.cache_data(ttl=86400)
 def haal_analistenadvies(ticker):
 
     try:
 
-        if pd.isna(ticker):
+        if pd.isna(ticker) or ticker == "":
             return "⚪ Geen data"
 
-        advies = yf.Ticker(ticker).info.get(
-            "recommendationKey"
-        )
+        info = haal_ticker_info(ticker)
+
+        advies = info.get("recommendationKey")
 
         if advies == "strong_buy":
             return "🟢 Sterk kopen"
@@ -609,28 +675,37 @@ def haal_analistenadvies(ticker):
 
         return "⚪ Geen advies"
 
-    except Exception:
+    except:
+
         return "⚪ Geen advies"
 
+
+@st.cache_data(ttl=86400)
 def haal_koersdoel(ticker):
 
     try:
 
-        if pd.isna(ticker):
+        if pd.isna(ticker) or ticker == "":
             return np.nan
 
-        return yf.Ticker(ticker).info.get(
-            "targetMeanPrice"
-        )
+        info = haal_ticker_info(ticker)
+
+        return info.get("targetMeanPrice")
 
     except:
+
         return np.nan
 
+
+@st.cache_data(ttl=86400)
 def haal_sector(ticker):
 
     try:
 
-        info = yf.Ticker(ticker).info
+        if pd.isna(ticker) or ticker == "":
+            return "Onbekend"
+
+        info = haal_ticker_info(ticker)
 
         sector = info.get("sector")
 
@@ -645,13 +720,19 @@ def haal_sector(ticker):
         return "Onbekend"
 
     except:
+
         return "Onbekend"
 
+
+@st.cache_data(ttl=86400)
 def haal_dividendrendement(ticker):
 
     try:
 
-        info = yf.Ticker(ticker).info
+        if pd.isna(ticker) or ticker == "":
+            return 0
+
+        info = haal_ticker_info(ticker)
 
         dividend = info.get(
             "trailingAnnualDividendRate"
@@ -679,11 +760,17 @@ def haal_dividendrendement(ticker):
         )
 
     except:
+
         return 0
 
+
+@st.cache_data(ttl=86400)
 def haal_earnings_datum(ticker):
 
     try:
+
+        if pd.isna(ticker) or ticker == "":
+            return None
 
         tk = yf.Ticker(ticker)
 
@@ -700,6 +787,7 @@ def haal_earnings_datum(ticker):
         return None
 
     except:
+
         return None
 
 # ===================================
