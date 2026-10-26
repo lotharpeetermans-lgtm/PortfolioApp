@@ -17,16 +17,14 @@ st.set_page_config(
     layout="wide"
 )
 
-bestanden = glob.glob("exports/*.xlsx")
-
-if not bestanden:
-    st.error("Geen Excel-bestanden gevonden in exports.")
-    st.stop()
-
-nieuwste_bestand = max(
-    bestanden,
-    key=os.path.getmtime
+uploaded_file = st.file_uploader(
+    "📂 Upload je Bolero-export",
+    type=["xlsx"]
 )
+
+if uploaded_file is None:
+    st.info("Upload een Bolero-export om te starten.")
+    st.stop()
 
 st.title("📈 Mijn Beleggingsdashboard")
 
@@ -39,7 +37,7 @@ st.caption(
 )
 
 st.caption(
-    f"📂 Actieve export: {os.path.basename(nieuwste_bestand)}"
+    f"📂 Actieve export: {uploaded_file.name}"
 )
 
 # ===================================
@@ -49,9 +47,9 @@ st.caption(
 try:
 
     raw = pd.read_excel(
-        nieuwste_bestand,
-        header=None,
-        engine="openpyxl"
+    uploaded_file,
+    header=None,
+    engine="openpyxl"
     )
 
     header_row = None
