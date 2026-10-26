@@ -2,10 +2,9 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import numpy as np
-import glob
-import os
 from datetime import datetime
 from streamlit_calendar import calendar
+import json
 
 # ===================================
 # PAGINA
@@ -135,41 +134,38 @@ for kolom in numerieke_kolommen:
 # ISIN -> TICKER
 # ===================================
 
-tickers = {
+try:
 
-    # Aandelen
+    with open("tickers.json", "r") as f:
 
-    "BE0974293251": "ABI.BR",
-    "NL0010832176": "ARGX.BR",
-    "US0231351067": "AMZN",
-    "US0320951017": "APH",
-    "US67066G1040": "NVDA",
-    "US68389X1054": "ORCL",
-    "US5738741041": "MRVL",
-    "US8740541094": "TTWO",
-    "US92840M1027": "VST",
-"FR0013233012": "IVA.PA",      
-"US15675D1037": "CBRS",        
-"US21873S1087": "CRWV",        
-"KYG4124C1096": "GRAB",        
-"US5949181045": "MSFT",
-"NL0010391025": "PHARM.AS",
-"US69608A1088": "PLTR",  
-"US84615Q1031": "SPCX",
+        tickers = json.load(f)
 
-    # ETF's
+except:
 
-    "IE00B8FHGS14": "MVOL.L",
-    "IE00B4L5Y983": "IWDA.AS",
-    "IE00B4ND3602": "IGLN.L",
-    "IE00BKM4GZ66": "EMIM.L",
-    "IE00BYZK4552": "RBOT.L",
-    "LU1781541252": "LCUJ.DE",
-    "IE00BCBJG560": "WOSC.AS",
-    "IE00B3RBWM25": "VWRL.AS",
-    "IE000VAHT5T0": "VALL.AS",
-    "IE00B3WJKG14": "IUIT.L",
-}
+    tickers = {}
+
+# ===================================
+# ONBEKENDE ISIN'S
+# ===================================
+
+onbekende_df = df[
+    ~df["ISIN"]
+    .astype(str)
+    .str.strip()
+    .isin(tickers.keys())
+][["Naam", "ISIN"]].drop_duplicates()
+
+if not onbekende_df.empty:
+
+    st.warning(
+        "⚠️ Nieuwe aandelen/ETF's gevonden zonder ticker."
+    )
+
+    st.dataframe(
+        onbekende_df,
+        hide_index=True,
+        use_container_width=True
+    )
 
 # ===================================
 # REALTIME KOERSEN
@@ -198,6 +194,11 @@ for index, row in df.iterrows():
             ).strip().upper()
 
             if isin not in tickers:
+
+                df.at[index, "Realtime koers"] = np.nan
+                df.at[index, "Dag %"] = np.nan
+                df.at[index, "Realtime rendement %"] = np.nan
+
                 continue
 
             ticker = yf.Ticker(
@@ -328,6 +329,8 @@ df["Ticker"] = (
     .map(tickers)
 )
 
+df["Ticker"] = df["Ticker"].fillna("")
+
 # EUR/USD wisselkoers
 
 try:
@@ -347,7 +350,7 @@ except Exception:
 # ===================================
 
 df["Winst/Verlies €"] = np.where(
-    df["Ticker"].str.contains(
+    df["Ticker"].astype(str).str.contains(
         r"\.(AS|BR|PA|DE|L)$",
         na=False
     ),
@@ -1309,6 +1312,10 @@ earnings_data = {
 
 with tab4:
 
+    # ==============================
+    # KOMENDE EARNINGS
+    # ==============================
+
     st.subheader("📅 Komende Earnings")
 
     earnings_tabel = pd.DataFrame(
@@ -1325,6 +1332,10 @@ with tab4:
     )
 
     st.divider()
+
+    # ==============================
+    # TOP 10 KOOPKANSEN
+    # ==============================
 
     st.subheader("🏆 Top 10 Wereldwijde Koopkansen")
 
@@ -1356,3 +1367,87 @@ with tab4:
             hide_index=True,
             use_container_width=True
         )
+
+    st.divider()
+
+    # ==============================
+    # ONBEKENDE ISIN'S
+    # ==============================
+
+    st.subheader("⚠️ Onbekende ISIN's")
+
+    onbekende_df = df[
+        ~df["ISIN"]
+        .astype(str)
+        .str.strip()
+        .isin(tickers.keys())
+    ][["Naam", "ISIN"]].drop_duplicates()
+
+    if onbekende_df.empty:
+
+        st.success(
+            "✅ Alle ISIN's hebben een ticker."
+        )
+
+    else:
+
+        st.warning(
+            "Nieuwe aandelen/ETF's gevonden zonder ticker."
+        )
+
+        st.dataframe(
+            onbekende_df,
+            hide_index=True,
+            use_container_width=True
+        )
+
+    st.divider()
+
+    # ==============================
+    # TICKERBEHEER
+    # ==============================
+
+    st.subheader("⚙️ Tickerbeheer")
+
+    with st.form("ticker_form"):
+
+        nieuwe_isin = st.text_input(
+            "Nieuwe ISIN"
+        ).strip().upper()
+
+        nieuwe_ticker = st.text_input(
+            "Ticker"
+        ).strip().upper()
+
+        opslaan = st.form_submit_button(
+            "💾 Opslaan"
+        )
+
+        if opslaan:
+
+            if nieuwe_isin and nieuwe_ticker:
+
+                tickers[nieuwe_isin] = nieuwe_ticker
+
+                with open(
+                    "tickers.json",
+                    "w"
+                ) as f:
+
+                    json.dump(
+                        tickers,
+                        f,
+                        indent=4
+                    )
+
+                st.success(
+                    f"{nieuwe_isin} → {nieuwe_ticker} opgeslagen."
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "Vul zowel ISIN als ticker in."
+                )
