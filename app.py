@@ -874,8 +874,8 @@ df["Analistenadvies"] = df["Ticker"].apply(
     haal_analistenadvies
 )
 
-df["Koersdoel"] = df["Ticker"].apply(
-    haal_koersdoel
+st.write(yf.Ticker("MSFT").info)
+
 )
 st.write(
     df[
