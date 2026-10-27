@@ -11,6 +11,12 @@ from auth import (
     login_user
 )
 
+from transactions import (
+    voeg_transactie_toe,
+    haal_transacties_op
+)
+
+
 # ===================================
 # PAGINA
 # ===================================
@@ -1156,12 +1162,13 @@ def formatteer_tabel(df_style):
 # TABS
 # ===================================
 
-tab1, tab2, tab3, tab4 = st.tabs(
+tab1, tab2, tab3, tab4, tab5 = st.tabs(
     [
-        "📊 Overzicht",
+        "💰 Portefeuillebeheer",
+        "📊 Dashboard",
         "💼 Portefeuille",
         "📈 Analyse",
-        "🤖 Advies"
+        "🤖 Koopkansen"
     ]
 )
 
