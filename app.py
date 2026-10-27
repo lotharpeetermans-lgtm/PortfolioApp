@@ -1179,13 +1179,83 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
 
 with tab1:
 
-    st.subheader("💰 Portefeuillebeheer")
+    st.subheader("🛒 Nieuwe transactie")
 
-    st.info(
-        "Binnenkort beheer je hier alle aankopen, "
-        "verkopen en transacties rechtstreeks vanuit "
-        "de database."
+    datum = st.date_input(
+        "Datum"
     )
+
+    ticker = st.text_input(
+        "Ticker"
+    )
+
+    transactie_type = st.selectbox(
+        "Type",
+        [
+            "KOOP",
+            "VERKOOP"
+        ]
+    )
+
+    aantal = st.number_input(
+        "Aantal",
+        min_value=0.0,
+        step=1.0
+    )
+
+    prijs = st.number_input(
+        "Prijs",
+        min_value=0.0
+    )
+
+    kosten = st.number_input(
+        "Kosten",
+        min_value=0.0
+    )
+
+    if st.button("💾 Transactie opslaan"):
+
+        voeg_transactie_toe(
+            st.session_state.user_id,
+            str(datum),
+            ticker.upper(),
+            transactie_type,
+            aantal,
+            prijs,
+            kosten
+        )
+
+        st.success(
+            "✅ Transactie opgeslagen."
+        )
+
+        st.rerun()
+
+    st.divider()
+
+    st.subheader("📋 Transactiehistoriek")
+
+    response = haal_transacties_op(
+        st.session_state.user_id
+    )
+
+    if response.data:
+
+        historiek_df = pd.DataFrame(
+            response.data
+        )
+
+        st.dataframe(
+            historiek_df,
+            hide_index=True,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "Nog geen transacties aanwezig."
+        )
 
 # ===================================
 # TAB 2
