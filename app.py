@@ -874,12 +874,6 @@ df["Analistenadvies"] = df["Ticker"].apply(
     haal_analistenadvies
 )
 
-st.write(yf.Ticker("MSFT").info)
-
-msft = yf.Ticker("MSFT")
-
-st.write(msft.analyst_price_targets)
-
 df["Sector"] = df["Ticker"].apply(
     haal_sector
 )
