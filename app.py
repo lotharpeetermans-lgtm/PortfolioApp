@@ -161,10 +161,54 @@ if not onbekende_df.empty:
         "⚠️ Nieuwe aandelen/ETF's gevonden zonder ticker."
     )
 
-    st.dataframe(
+    onbekende_df["Ticker"] = ""
+
+    bewerkt_df = st.data_editor(
         onbekende_df,
         hide_index=True,
         use_container_width=True
+    )
+
+    if st.button("💾 Nieuwe tickers opslaan"):
+
+        toegevoegd = 0
+
+        for _, row in bewerkt_df.iterrows():
+
+            isin = str(
+                row["ISIN"]
+            ).strip().upper()
+
+            ticker = str(
+                row["Ticker"]
+            ).strip().upper()
+
+            if ticker:
+
+                tickers[isin] = ticker
+                toegevoegd += 1
+
+        with open(
+            "tickers.json",
+            "w"
+        ) as f:
+
+            json.dump(
+                tickers,
+                f,
+                indent=4
+            )
+
+        st.success(
+            f"{toegevoegd} tickers opgeslagen."
+        )
+
+        st.rerun()
+
+else:
+
+    st.success(
+        "✅ Alle ISIN's hebben een ticker."
     )
 
 # ===================================
