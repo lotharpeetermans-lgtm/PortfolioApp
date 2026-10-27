@@ -54,28 +54,67 @@ def bereken_posities(user_id):
 
     df = pd.DataFrame(response.data)
 
-    df["signed_aantal"] = df.apply(
-        lambda row:
-        row["aantal"]
-        if row["type"] == "KOOP"
-        else -row["aantal"],
-        axis=1
+    posities = []
+
+    for ticker in df["ticker"].unique():
+
+        subset = df[
+            df["ticker"] == ticker
+        ]
+
+        gekocht = subset[
+            subset["type"] == "KOOP"
+        ]
+
+        verkocht = subset[
+            subset["type"] == "VERKOOP"
+        ]
+
+        totaal_gekocht = gekocht[
+            "aantal"
+        ].sum()
+
+        totaal_verkocht = verkocht[
+            "aantal"
+        ].sum()
+
+        open_aantal = (
+            totaal_gekocht -
+            totaal_verkocht
+        )
+
+        if open_aantal <= 0:
+            continue
+
+        totale_kost = (
+            gekocht["aantal"]
+            * gekocht["prijs"]
+        ).sum()
+
+        gemiddelde_prijs = (
+            totale_kost
+            / totaal_gekocht
+        )
+
+        posities.append(
+            {
+                "Ticker": ticker,
+                "Aantal": round(
+                    open_aantal,
+                    2
+                ),
+                "Gem. aankoopprijs": round(
+                    gemiddelde_prijs,
+                    2
+                ),
+                "Kostbasis": round(
+                    open_aantal *
+                    gemiddelde_prijs,
+                    2
+                )
+            }
+        )
+
+    return pd.DataFrame(
+        posities
     )
-
-    posities = (
-        df.groupby("ticker")
-        ["signed_aantal"]
-        .sum()
-        .reset_index()
-    )
-
-    posities = posities[
-        posities["signed_aantal"] > 0
-    ]
-
-    posities.columns = [
-        "Ticker",
-        "Aantal"
-    ]
-
-    return posities
