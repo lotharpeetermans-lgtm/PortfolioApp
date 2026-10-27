@@ -874,6 +874,10 @@ df["Analistenadvies"] = df["Ticker"].apply(
     haal_analistenadvies
 )
 
+df["Koersdoel"] = df["Ticker"].apply(
+    haal_koersdoel
+)
+
 df["Sector"] = df["Ticker"].apply(
     haal_sector
 )
