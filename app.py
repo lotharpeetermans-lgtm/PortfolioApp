@@ -373,183 +373,44 @@ elif not df.empty:
     )
 
 # ===================================
-# REALTIME KOERSEN
+# REALTIME KOERSEN (enkel Bolero)
 # ===================================
 
-df["Realtime koers"] = np.nan
-df["Dag %"] = np.nan
-df["Realtime rendement %"] = np.nan
+if not df.empty and "ISIN" in df.columns:
 
-for index, row in df.iterrows():
-
-    try:
-
-        instrument_type = str(
-            row["Type"]
-        ).strip()
-
-        # ==========================
-        # AANDELEN
-        # ==========================
-
-        if instrument_type == "Aandelen":
-
-            isin = str(
-                row["ISIN"]
-            ).strip().upper()
-
-            if isin not in tickers:
-
-                df.at[index, "Realtime koers"] = np.nan
-                df.at[index, "Dag %"] = np.nan
-                df.at[index, "Realtime rendement %"] = np.nan
-
-                continue
-
-            ticker = yf.Ticker(
-                tickers[isin]
-            )
-
-            hist = ticker.history(
-                period="2d"
-            )
-
-            if len(hist) < 2:
-                continue
-
-            koers = float(
-                hist["Close"].iloc[-1]
-            )
-
-            vorige = float(
-                hist["Close"].iloc[-2]
-            )
-
-            aankoopprijs = pd.to_numeric(
-                row["Gem. aankoopkoers"],
-                errors="coerce"
-            )
-
-            if (
-                pd.isna(aankoopprijs)
-                or aankoopprijs <= 0
-            ):
-                continue
-
-            dag_pct = (
-                (koers - vorige)
-                / vorige
-            ) * 100
-
-            realtime_rendement = (
-                (koers - aankoopprijs)
-                / aankoopprijs
-            ) * 100
-
-            df.at[
-                index,
-                "Realtime koers"
-            ] = round(
-                koers,
-                2
-            )
-
-            df.at[
-                index,
-                "Dag %"
-            ] = round(
-                dag_pct,
-                2
-            )
-
-            df.at[
-                index,
-                "Realtime rendement %"
-            ] = round(
-                realtime_rendement,
-                2
-            )
-
-        # ==========================
-        # ETF'S
-        # ==========================
-
-        else:
-
-            koers = pd.to_numeric(
-                row["Koers"],
-                errors="coerce"
-            )
-
-            dag_pct = pd.to_numeric(
-                row["Wijziging (%)"],
-                errors="coerce"
-            )
-
-            aankoopprijs = pd.to_numeric(
-                row["Gem. aankoopkoers"],
-                errors="coerce"
-            )
-
-            if pd.notna(koers):
-
-                df.at[index, "Realtime koers"] = round(
-                    koers,
-                    2
-                )
-
-            if pd.notna(dag_pct):
-
-                df.at[index, "Dag %"] = round(
-                    dag_pct,
-                    2
-                )
-
-            if (
-                pd.notna(koers)
-                and pd.notna(aankoopprijs)
-                and aankoopprijs > 0
-            ):
-
-                realtime_rendement = (
-                    (koers - aankoopprijs)
-                    / aankoopprijs
-                ) * 100
-
-                df.at[
-                    index,
-                    "Realtime rendement %"
-                ] = round(
-                    realtime_rendement,
-                    2
-                )
-
-    except Exception:
-        pass
-
-df["Ticker"] = (
-    df["ISIN"]
-    .astype(str)
-    .str.strip()
-    .map(tickers)
-)
-
-df["Ticker"] = df["Ticker"].fillna("")
-
-# EUR/USD wisselkoers
-
-try:
-
-    eurusd = yf.Ticker("EURUSD=X")
-
-    wisselkoers = float(
-        eurusd.history(period="1d")["Close"].iloc[-1]
+    df["Ticker"] = (
+        df["ISIN"]
+        .astype(str)
+        .str.strip()
+        .map(tickers)
     )
 
-except Exception:
+    df["Ticker"] = df["Ticker"].fillna("")
+
+    df["Realtime koers"] = np.nan
+    df["Dag %"] = np.nan
+    df["Realtime rendement %"] = np.nan
+
+    # EUR/USD wisselkoers
+    try:
+
+        eurusd = yf.Ticker(
+            "EURUSD=X"
+        )
+
+        wisselkoers = float(
+            eurusd.history(
+                period="1d"
+            )["Close"].iloc[-1]
+        )
+
+    except:
+
+        wisselkoers = 1.15
+
+else:
 
     wisselkoers = 1.15
-
 # ===================================
 # BEREKENINGEN
 # ===================================
