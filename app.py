@@ -303,12 +303,18 @@ except:
 # ONBEKENDE ISIN'S
 # ===================================
 
-onbekende_df = df[
-    ~df["ISIN"]
-    .astype(str)
-    .str.strip()
-    .isin(tickers.keys())
-][["Naam", "ISIN"]].drop_duplicates()
+if df.empty or "ISIN" not in df.columns:
+
+    onbekende_df = pd.DataFrame()
+
+else:
+
+    onbekende_df = df[
+        ~df["ISIN"]
+        .astype(str)
+        .str.strip()
+        .isin(tickers.keys())
+    ][["Naam", "ISIN"]].drop_duplicates()
 
 if not onbekende_df.empty:
 
@@ -360,7 +366,7 @@ if not onbekende_df.empty:
 
         st.rerun()
 
-else:
+elif not df.empty:
 
     st.success(
         "✅ Alle ISIN's hebben een ticker."
