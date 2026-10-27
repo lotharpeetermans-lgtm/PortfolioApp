@@ -49,3 +49,4 @@ watchdog==6.0.0
 websockets==17.2
 yfinance==1.7.0
 bcrypt
+supabase
