@@ -1512,14 +1512,17 @@ with tab4:
             use_container_width=True
         )
 
-        st.download_button(
-            "⬇️ Download onbekende ISIN's",
-            onbekende_df.to_csv(
-                index=False
-            ).encode("utf-8"),
-            file_name="onbekende_isins.csv",
-            mime="text/csv"
-        )
+        json_data = json.dumps(
+    tickers,
+    indent=4
+)
+
+st.download_button(
+    label="⬇️ Download ISIN-database",
+    data=json_data,
+    file_name="tickers.json",
+    mime="application/json"
+)
 
     st.divider()
 
