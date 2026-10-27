@@ -174,70 +174,94 @@ else:
 # BOLERO BESTAND INLEZEN
 # ===================================
 
-try:
+df = pd.DataFrame()
 
-    raw = pd.read_excel(
-    uploaded_file,
-    header=None,
-    engine="openpyxl"
-    )
+if uploaded_file is not None:
 
-    header_row = None
+    try:
 
-    for idx, row in raw.iterrows():
-
-        if row.astype(str).str.contains(
-            "ISIN",
-            case=False,
-            na=False
-        ).any():
-
-            header_row = idx
-            break
-
-    if header_row is None:
-        st.error("Geen geldige Bolero-export gevonden.")
-        st.stop()
-
-    headers = raw.iloc[header_row]
-
-    geldige_kolommen = headers.dropna().index
-
-    df = raw.iloc[
-        header_row + 1:,
-        geldige_kolommen
-    ].copy()
-
-    df.columns = headers.dropna().values
-
-    df = df.dropna(how="all")
-
-    df.columns = (
-        df.columns
-        .astype(str)
-        .str.strip()
-    )
-
-    df["Type"] = (
-        df["Type"]
-        .astype(str)
-        .str.strip()
-    )
-
-    df = df[
-        df["Type"].str.contains(
-            "Aandelen|ETF",
-            case=False,
-            na=False
+        raw = pd.read_excel(
+            uploaded_file,
+            header=None,
+            engine="openpyxl"
         )
-    ]
 
-    df.reset_index(drop=True, inplace=True)
+        header_row = None
 
-except Exception as e:
+        for idx, row in raw.iterrows():
 
-    st.error(f"Fout bij inlezen Excel: {e}")
-    st.stop()
+            if row.astype(str).str.contains(
+                "ISIN",
+                case=False,
+                na=False
+            ).any():
+
+                header_row = idx
+                break
+
+        if header_row is None:
+
+            st.error(
+                "Geen geldige Bolero-export gevonden."
+            )
+
+        else:
+
+            headers = raw.iloc[header_row]
+
+            geldige_kolommen = (
+                headers
+                .dropna()
+                .index
+            )
+
+            df = raw.iloc[
+                header_row + 1:,
+                geldige_kolommen
+            ].copy()
+
+            df.columns = (
+                headers
+                .dropna()
+                .values
+            )
+
+            df = df.dropna(
+                how="all"
+            )
+
+            df.columns = (
+                df.columns
+                .astype(str)
+                .str.strip()
+            )
+
+            if "Type" in df.columns:
+
+                df["Type"] = (
+                    df["Type"]
+                    .astype(str)
+                    .str.strip()
+                )
+
+                df = df[
+                    df["Type"].str.contains(
+                        "Aandelen|ETF",
+                        case=False,
+                        na=False
+                    )
+                ]
+
+            df.reset_index(
+                drop=True,
+                inplace=True
+            )
+
+    except Exception as e:
+
+        st.error(
+            f"Fout bij inlezen Excel: {e}"
+        )
 
 # ===================================
 # NUMERIEKE KOLOMMEN
