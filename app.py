@@ -876,13 +876,9 @@ df["Analistenadvies"] = df["Ticker"].apply(
 
 st.write(yf.Ticker("MSFT").info)
 
-tk = yf.Ticker("MSFT")
+msft = yf.Ticker("MSFT")
 
-st.write("Recommendations")
-st.write(tk.recommendations)
-
-st.write("Analyst price targets")
-st.write(tk.analyst_price_targets)
+st.write(msft.analyst_price_targets)
 
 st.write(
     df[
