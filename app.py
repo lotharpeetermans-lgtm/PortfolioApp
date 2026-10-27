@@ -411,82 +411,94 @@ if not df.empty and "ISIN" in df.columns:
 else:
 
     wisselkoers = 1.15
+
 # ===================================
 # BEREKENINGEN
 # ===================================
 
-df["Winst/Verlies €"] = np.where(
-    df["Ticker"].astype(str).str.contains(
-        r"\.(AS|BR|PA|DE|L)$",
-        na=False
-    ),
-    (
-        (df["Realtime koers"]
-         - df["Gem. aankoopkoers"])
-        * df["Aantal"]
-    ),
-    (
-        (df["Realtime koers"]
-         - df["Gem. aankoopkoers"])
-        * df["Aantal"]
-    ) / wisselkoers
-)
+if not df.empty and "Ticker" in df.columns:
 
-df["Winst/Verlies €"] = pd.to_numeric(
-    df["Winst/Verlies €"],
-    errors="coerce"
-).round(2)
+    df["Winst/Verlies €"] = np.where(
+        df["Ticker"].astype(str).str.contains(
+            r"\.(AS|BR|PA|DE|L)$",
+            na=False
+        ),
+        (
+            (df["Realtime koers"]
+             - df["Gem. aankoopkoers"])
+            * df["Aantal"]
+        ),
+        (
+            (df["Realtime koers"]
+             - df["Gem. aankoopkoers"])
+            * df["Aantal"]
+        ) / wisselkoers
+    )
 
+    df["Winst/Verlies €"] = pd.to_numeric(
+        df["Winst/Verlies €"],
+        errors="coerce"
+    ).round(2)
 
-totale_waarde = df["Waarde in EUR"].sum()
+    totale_waarde = df["Waarde in EUR"].sum()
 
-df["Gewicht %"] = (
-    df["Waarde in EUR"]
-    / totale_waarde
-    * 100
-).round(2)
+    df["Gewicht %"] = (
+        df["Waarde in EUR"]
+        / totale_waarde
+        * 100
+    ).round(1)
 
-df["Gewicht %"] = (
-    df["Waarde in EUR"]
-    / totale_waarde
-    * 100
-).round(1)
+    netto_inleg = pd.to_numeric(
+        df["Totale aankoopwaarde"],
+        errors="coerce"
+    ).sum()
 
-netto_inleg = pd.to_numeric(
-    df["Totale aankoopwaarde"],
-    errors="coerce"
-).sum()
+    totale_winst = (
+        totale_waarde - netto_inleg
+    )
 
-totale_winst = totale_waarde - netto_inleg
+    if netto_inleg > 0:
 
-if netto_inleg > 0:
-    totale_winst_pct = (
-        totale_winst / netto_inleg
-    ) * 100
+        totale_winst_pct = (
+            totale_winst
+            / netto_inleg
+        ) * 100
+
+    else:
+
+        totale_winst_pct = 0
+
+    aantal_posities = len(df)
+
+    aantal_aandelen = len(
+        df[
+            df["Type"]
+            .str.contains(
+                "Aandelen",
+                na=False
+            )
+        ]
+    )
+
+    aantal_etfs = len(
+        df[
+            df["Type"]
+            .str.contains(
+                "ETF",
+                na=False
+            )
+        ]
+    )
+
 else:
+
+    totale_waarde = 0
+    netto_inleg = 0
+    totale_winst = 0
     totale_winst_pct = 0
-
-aantal_posities = len(df)
-
-aantal_aandelen = len(
-    df[
-        df["Type"]
-        .str.contains(
-            "Aandelen",
-            na=False
-        )
-    ]
-)
-
-aantal_etfs = len(
-    df[
-        df["Type"]
-        .str.contains(
-            "ETF",
-            na=False
-        )
-    ]
-)
+    aantal_posities = 0
+    aantal_aandelen = 0
+    aantal_etfs = 0
 
 # ===================================
 # WERELDWIJDE KOOPKANSEN
