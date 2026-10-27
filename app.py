@@ -386,14 +386,19 @@ df["Gewicht %"] = (
     * 100
 ).round(1)
 
-netto_inleg = 23500
+netto_inleg = pd.to_numeric(
+    df["Totale aankoopwaarde"],
+    errors="coerce"
+).sum()
 
 totale_winst = totale_waarde - netto_inleg
 
-totale_winst_pct = (
-    totale_winst
-    / netto_inleg
-) * 100
+if netto_inleg > 0:
+    totale_winst_pct = (
+        totale_winst / netto_inleg
+    ) * 100
+else:
+    totale_winst_pct = 0
 
 aantal_posities = len(df)
 
