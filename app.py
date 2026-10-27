@@ -3,8 +3,6 @@ import pandas as pd
 import yfinance as yf
 import numpy as np
 from datetime import datetime
-from streamlit_calendar import calendar
-import json
 
 from auth import (
     registreer_gebruiker,
@@ -128,23 +126,6 @@ if "user_id" not in st.session_state:
 
     st.stop()
 
-with st.expander("📥 Bolero import (optioneel)"):
-
-    uploaded_file = st.file_uploader(
-        "Upload je Bolero-export",
-        type=["xlsx"]
-    )
-
-if uploaded_file is not None:
-
-    df = pd.read_excel(
-        uploaded_file
-    )
-
-else:
-
-    df = pd.DataFrame()
-
 st.title("📈 Beyond Beleggingen")
 
 if st.button("🔄 Portefeuille verversen"):
@@ -157,18 +138,6 @@ st.caption(
     f"🕒 Laatst vernieuwd: "
     f"{datetime.now().strftime('%H:%M:%S')}"
 )
-
-if uploaded_file is not None:
-
-    st.caption(
-        f"📂 Actieve export: {uploaded_file.name}"
-    )
-
-else:
-
-    st.caption(
-        "📂 Geen Bolero-export geladen"
-    )
 
 # ===================================
 # TABS
@@ -248,19 +217,19 @@ with tab1:
     st.subheader("📋 Transactiehistoriek")
 
     response = haal_transacties_op(
-    st.session_state.user_id
-)
-
-if response.data:
-
-    historiek_df = pd.DataFrame(
-        response.data
+        st.session_state.user_id
     )
 
-    historiek_df = historiek_df.sort_values(
-        "datum",
-        ascending=False
-    )
+    if response.data:
+
+        historiek_df = pd.DataFrame(
+            response.data
+        )
+
+        historiek_df = historiek_df.sort_values(
+            "datum",
+            ascending=False
+        )
 
     for _, row in historiek_df.iterrows():
 
