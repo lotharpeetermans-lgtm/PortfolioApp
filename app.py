@@ -138,36 +138,36 @@ type=["xlsx"]
 # Alleen inlezen als er effectief een bestand is
 
 if uploaded_file is not None:
- 
+
 df = pd.read_excel(
 uploaded_file
 )
- 
+
 else:
- 
+
 df = pd.DataFrame()
- 
+
 st.title("📈 Beyond Beleggingen")
- 
+
 if st.button("🔄 Portefeuille verversen"):
- 
+
 st.cache_data.clear()
 st.rerun()
- 
+
 st.caption(
 f"🕒 Laatst vernieuwd: "
 f"{datetime.now().strftime('%H:%M:%S')}"
 )
- 
+
 if uploaded_file is not None:
- 
+
 st.caption(
 f"📂 Actieve export: "
 f"{uploaded_file.name}"
 )
- 
+
 else:
- 
+
 st.caption(
 "📂 Geen Bolero-export geladen"
 )
