@@ -517,7 +517,12 @@ def bereken_wereldwijde_koopkansen():
 
         try:
 
-            info = yf.Ticker(ticker).info
+            tk = yf.Ticker(ticker)
+
+            try:
+                info = tk.info
+            except:
+                continue
 
             advies = info.get("recommendationKey")
             koersdoel = info.get("targetMeanPrice")
@@ -868,7 +873,6 @@ def kleur_advies(val):
 # ===================================
 # ADVIESKOLOM
 # ===================================
-
 
 df["Analistenadvies"] = df["Ticker"].apply(
     haal_analistenadvies
