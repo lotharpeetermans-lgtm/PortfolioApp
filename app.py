@@ -489,40 +489,18 @@ with tab4:
             grafiek_df["Rendement %"]
         )
 # ===================================
-# TAB 5 - ADVIES
+# TAB 5 - KOOPKANSEN
 # ===================================
 
 with tab5:
 
     st.subheader(
-        "🏆 Top 10 Wereldwijde Koopkansen"
+        "🏆 Wereldwijde Koopkansen"
     )
 
-    if not wereld_koopkansen.empty:
-
-        st.data_editor(
-            wereld_koopkansen[
-                [
-                    "Ticker",
-                    "Sector",
-                    "Analistenadvies",
-                    "Analisten",
-                    "Koers",
-                    "Koersdoel",
-                    "Potentieel %",
-                    "Koopscore"
-                ]
-            ],
-            disabled=True,
-            hide_index=True,
-            use_container_width=True
-        )
-
-    else:
-
-        st.info(
-            "Momenteel geen koopkansen beschikbaar."
-        )
+    st.info(
+        "Koopkansenmodule wordt momenteel herwerkt."
+    )
 
 # ===================================
 # TAB 6 - INSTELLINGEN
