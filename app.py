@@ -220,31 +220,7 @@ with tab1:
         st.session_state.user_id
     )
 
-    if response.data:
-
-        historiek_df = pd.DataFrame(
-            response.data
-        )
-
-        historiek_df = historiek_df.sort_values(
-            "datum",
-            ascending=False
-        )
-
-    for _, row in historiek_df.iterrows():
-
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(
-            [2, 2, 2, 2, 2, 2, 1]
-        )
-
-        col1.write(row["datum"])
-        col2.write(row["ticker"])
-        col3.write(row["type"])
-        col4.write(row["aantal"])
-        col5.write(f"€ {row['prijs']}")
-        col6.write(f"€ {row['kosten']}")
-
-        if col7.button(
+    
             "🗑️",
             key=f"delete_{row['id']}"
         ):
@@ -413,12 +389,15 @@ with tab4:
 
     if posities_df.empty:
 
-        st.info("Geen analyse beschikbaar.")
+        st.info(
+            "Geen analyse beschikbaar."
+        )
 
     else:
 
         winnaars = (
-            posities_df.sort_values(
+            posities_df
+            .sort_values(
                 "Rendement %",
                 ascending=False
             )
@@ -426,7 +405,8 @@ with tab4:
         )
 
         verliezers = (
-            posities_df.sort_values(
+            posities_df
+            .sort_values(
                 "Rendement %",
                 ascending=True
             )
@@ -443,10 +423,13 @@ with tab4:
                     "Winst/Verlies"
                 ]
             ],
+            hide_index=True,
+            use_container_width=True
+        )
 
         st.subheader("📉 Top verliezers")
 
-         st.dataframe(
+        st.dataframe(
             verliezers[
                 [
                     "Ticker",
@@ -454,6 +437,9 @@ with tab4:
                     "Winst/Verlies"
                 ]
             ],
+            hide_index=True,
+            use_container_width=True
+        )
 # ===================================
 # TAB 5 - ADVIES
 # ===================================
