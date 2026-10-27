@@ -128,14 +128,16 @@ if "user_id" not in st.session_state:
 
     st.stop()
 
-uploaded_file = st.file_uploader(
-    "📂 Upload je Bolero-export",
-    type=["xlsx"]
-)
+with st.expander("📥 Bolero import (optioneel)"):
 
-if uploaded_file is None:
-    st.info("Upload een Bolero-export om te starten.")
-    st.stop()
+    uploaded_file = st.file_uploader(
+        "Upload je Bolero-export",
+        type=["xlsx"]
+    )
+
+if uploaded_file is not None:
+
+    df = pd.read_excel(uploaded_file)
 
 st.title("📈 Beyond Beleggingen")
 
