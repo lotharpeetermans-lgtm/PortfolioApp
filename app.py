@@ -1371,6 +1371,28 @@ with tab2:
 
 with tab3:
 
+    st.subheader("💼 Actuele Posities")
+
+    posities_df = bereken_posities(
+        st.session_state.user_id
+    )
+
+    if posities_df.empty:
+
+        st.info(
+            "Nog geen open posities."
+        )
+
+    else:
+
+        st.dataframe(
+            posities_df,
+            hide_index=True,
+            use_container_width=True
+        )
+
+    st.divider()
+    
     aandelen_tab, etf_tab = st.tabs(
         [
             "📈 Aandelen",
