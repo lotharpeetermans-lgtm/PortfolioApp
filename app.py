@@ -13,7 +13,8 @@ from auth import (
 
 from transactions import (
     voeg_transactie_toe,
-    haal_transacties_op
+    haal_transacties_op,
+    bereken_posities
 )
 
 
