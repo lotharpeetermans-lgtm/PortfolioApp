@@ -302,106 +302,66 @@ else:
 
 with tab2:
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    st.subheader("📊 Dashboard")
 
-    col1.metric(
-        "Portefeuillewaarde",
-        f"€ {totale_waarde:,.2f}"
+    posities_df = bereken_posities(
+        st.session_state.user_id
     )
 
-    col2.metric(
-        "Resultaat",
-        f"€ {totale_winst:,.2f}",
-        f"{totale_winst_pct:+.2f}%"
+    posities_df = verrijk_posities_met_koersen(
+        posities_df
     )
 
-    col3.metric(
-        "Inleg",
-        f"€ {netto_inleg:,.2f}"
-    )
+    if posities_df.empty:
 
-    col4.metric(
-        "Aandelen",
-        aantal_aandelen
-    )
+        st.info("Geen posities aanwezig.")
 
-    col5.metric(
-        "ETF's",
-        aantal_etfs
-    )
-
-    st.divider()
-
-    st.subheader("🩺 Portefeuille Health Check")
-
-    if grootste_positie["Gewicht %"] > 15:
-        st.warning(
-            f"Grootste positie: {grootste_positie['Naam']} "
-            f"({grootste_positie['Gewicht %']:.2f}%)"
-        )
     else:
-        st.success(
-            f"Grootste positie: {grootste_positie['Naam']} "
-            f"({grootste_positie['Gewicht %']:.2f}%)"
+
+        totale_kostbasis = (
+            posities_df["Kostbasis"].sum()
         )
 
-    if technologie_pct > 50:
-        st.warning(
-            f"Technologie weegt {technologie_pct:.2f}% van de portefeuille"
-        )
-    else:
-        st.success(
-            f"Technologie weegt {technologie_pct:.2f}% van de portefeuille"
+        totale_marktwaarde = (
+            posities_df["Marktwaarde"].sum()
         )
 
-    st.info(
-        f"ETF-aandeel portefeuille: {etf_pct:.2f}%"
-    )
-
-    st.success(
-        f"Beste wereldwijde koopkans momenteel: {beste_koopkans}"
-    )
-
-    st.info(
-        f"Verwacht dividend per jaar: "
-        f"€ {df['Verwacht dividend €/jaar'].sum():,.2f}"
-    )
-
-    st.divider()
-
-    st.subheader("🏆 Top 10 grootste posities")
-
-    top10_posities = (
-        df.sort_values(
-            "Waarde in EUR",
-            ascending=False
+        totale_winst = (
+            posities_df["Winst/Verlies"].sum()
         )
-        .head(10)
-    )
 
-    st.dataframe(
-        formatteer_tabel(
-            top10_posities[
-                [
-                    "Naam",
-                    "Aantal",
-                    "Gewicht %",
-                    "Waarde in EUR",
-                     "Winst/Verlies €",
-                    "Realtime rendement %"
-                ]
-            ]
-            .style.map(
-                kleur,
-                subset=[
-                    "Winst/Verlies €",
-                     "Realtime rendement %"
-                ]
-            )
-        ),
-        hide_index=True,
-        use_container_width=True
-    )
+        rendement = (
+            (totale_winst / totale_kostbasis) * 100
+            if totale_kostbasis > 0
+            else 0
+        )
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        col1.metric(
+            "Marktwaarde",
+            f"€ {totale_marktwaarde:,.2f}"
+        )
+
+        col2.metric(
+            "Kostbasis",
+            f"€ {totale_kostbasis:,.2f}"
+        )
+
+        col3.metric(
+            "Winst/Verlies",
+            f"€ {totale_winst:,.2f}"
+        )
+
+        col4.metric(
+            "Rendement",
+            f"{rendement:.2f}%"
+        )
+
+        col5.metric(
+            "Posities",
+            len(posities_df)
+        )
 
 # ===================================
 # TAB 3
@@ -456,149 +416,53 @@ with tab3:
 
 with tab4:
 
-    st.subheader("🏆 Top 5 winnaars (%)")
+    st.subheader("📈 Analyse")
 
-    winnaars = (
-        df.sort_values(
-            "Realtime rendement %",
-            ascending=False
-        )
-        [[
-            "Naam",
-            "Aantal",
-            "Realtime rendement %",
-            "Winst/Verlies €"
-        ]]
-        .head(5)
+    posities_df = bereken_posities(
+        st.session_state.user_id
     )
 
-    st.dataframe(
-        formatteer_tabel(
-            winnaars.style.map(
-                kleur,
-                subset=[
-                    "Realtime rendement %",
-                    "Winst/Verlies €"
-                ]
+    posities_df = verrijk_posities_met_koersen(
+        posities_df
+    )
+
+    if posities_df.empty:
+
+        st.info("Geen analyse beschikbaar.")
+
+    else:
+
+        winnaars = (
+            posities_df.sort_values(
+                "Rendement %",
+                ascending=False
             )
-        ),
-        hide_index=True,
-        use_container_width=True
-    )
-
-    st.subheader("📉 Top 5 verliezers (%)")
-
-    verliezers = (
-        df.sort_values(
-            "Realtime rendement %",
-            ascending=True
+            .head(5)
         )
-        [[
-            "Naam",
-            "Aantal",
-            "Realtime rendement %",
-            "Winst/Verlies €"
-        ]]
-        .head(5)
-    )
 
-    st.dataframe(
-        formatteer_tabel(
-            verliezers.style.map(
-                kleur,
-                subset=[
-                    "Realtime rendement %",
-                    "Winst/Verlies €"
-                ]
+        verliezers = (
+            posities_df.sort_values(
+                "Rendement %",
+                ascending=True
             )
-        ),
-        hide_index=True,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    st.subheader("🏭 Sectorverdeling")
-
-    sectoren = (
-        df.groupby("Sector")["Waarde in EUR"]
-        .sum()
-        .sort_values(
-            ascending=False
+            .head(5)
         )
-    )
 
-    st.bar_chart(sectoren)
+        st.subheader("🏆 Top winnaars")
 
-    st.divider()
+        st.dataframe(
+            winnaars,
+            hide_index=True,
+            use_container_width=True
+        )
 
-    st.subheader("📊 Yahoo Analyses")
+        st.subheader("📉 Top verliezers")
 
-    keuze = st.selectbox(
-        "Kies een aandeel of ETF",
-        df["Naam"].sort_values().unique()
-    )
-
-    ticker = df.loc[
-        df["Naam"] == keuze,
-        "Ticker"
-    ].iloc[0]
-
-    if pd.notna(ticker):
-
-        st.link_button(
-           "📈 Open Yahoo Analyse",
-           f"https://finance.yahoo.com/quote/{ticker}/analysis"
-    )
-
-        st.link_button(
-           "💰 Open Yahoo Financiële gegevens",
-           f"https://finance.yahoo.com/quote/{ticker}/financials"
-    )
-
-        st.link_button(
-           "📊 Open Yahoo Statistieken",
-           f"https://finance.yahoo.com/quote/{ticker}/key-statistics"
-    )
-
-    st.divider()
-
-    st.subheader("🌍 Spreiding portefeuille")
-
-    spreiding_type = (
-        df.groupby("Type")["Waarde in EUR"]
-        .sum()
-    )
-
-    st.bar_chart(spreiding_type)
-
-# ===================================
-# EARNINGS DATA
-# ===================================
-
-earnings_data = {
-
-    # Eigen portefeuille
-
-    "MSFT": "2026-10-28",
-    "AMZN": "2026-10-29",
-    "PLTR": "2026-11-02",
-    "PHARM.AS": "2026-11-05",
-    "NVDA": "2026-11-17",
-    "ORCL": "2026-12-09",
-    "ARGX.BR": "2027-02-25",
-
-    # Koopkansen
-
-    "GOOGL": "2026-10-28",
-    "META": "2026-10-28",
-    "AMD": "2026-11-03",
-    "CRM": "2026-12-02",
-    "AVGO": "2026-12-10",
-    "ADBE": "2026-12-09",
-    "ASML": "2027-01-27"
-}
-
+        st.dataframe(
+            verliezers,
+            hide_index=True,
+            use_container_width=True
+        )
 # ===================================
 # TAB 5 - ADVIES
 # ===================================
