@@ -872,10 +872,10 @@ def kleur_advies(val):
 
 df["Analistenadvies"] = df["Ticker"].apply(
     haal_analistenadvies
+)
 
 st.write(yf.Ticker("MSFT").info)
 
-)
 st.write(
     df[
         [
