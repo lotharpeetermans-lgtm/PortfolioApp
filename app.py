@@ -6,15 +6,118 @@ from datetime import datetime
 from streamlit_calendar import calendar
 import json
 
+from auth import (
+    registreer_gebruiker,
+    login_user
+)
+
 # ===================================
 # PAGINA
 # ===================================
 
 st.set_page_config(
-    page_title="Mijn Beleggingsdashboard",
+    page_title="Beyond Beleggingen",
     page_icon="📈",
     layout="wide"
 )
+
+if "user_id" not in st.session_state:
+
+    st.title("📈 Beyond Beleggingen")
+
+    col1, col2 = st.columns([8, 1])
+
+    with col2:
+
+        if st.button("🚪 Uitloggen"):
+
+            st.session_state.clear()
+
+            st.rerun()
+    
+    login_tab, register_tab = st.tabs(
+        [
+            "🔐 Inloggen",
+            "📝 Registreren"
+        ]
+    )
+
+    with login_tab:
+
+        email = st.text_input(
+            "E-mail",
+            key="login_email"
+        )
+
+        wachtwoord = st.text_input(
+            "Wachtwoord",
+            type="password",
+            key="login_password"
+        )
+
+        if st.button("🔓 Inloggen"):
+
+            gebruiker = login_user(
+                email,
+                wachtwoord
+            )
+
+            if gebruiker:
+
+                st.session_state.user_id = gebruiker["id"]
+                st.session_state.user_name = gebruiker["naam"]
+
+                st.success(
+                    f"Welkom {gebruiker['naam']}!"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "Onjuiste login."
+                )
+
+    with register_tab:
+
+        naam = st.text_input(
+            "Naam",
+            key="register_naam"
+        )
+
+        email = st.text_input(
+            "E-mail",
+            key="register_email"
+        )
+
+        wachtwoord = st.text_input(
+            "Wachtwoord",
+            type="password",
+            key="register_password"
+        )
+
+        if st.button("📝 Account aanmaken"):
+
+            try:
+
+                registreer_gebruiker(
+                    naam,
+                    email,
+                    wachtwoord
+                )
+
+                st.success(
+                    "Account aangemaakt. Je kan nu inloggen."
+                )
+
+            except Exception as e:
+
+                st.error(
+                    f"Fout: {e}"
+                )
+
+    st.stop()
 
 uploaded_file = st.file_uploader(
     "📂 Upload je Bolero-export",
@@ -25,7 +128,7 @@ if uploaded_file is None:
     st.info("Upload een Bolero-export om te starten.")
     st.stop()
 
-st.title("📈 Mijn Beleggingsdashboard")
+st.title("📈 Beyond Beleggingen")
 
 if st.button("🔄 Portefeuille verversen"):
     st.cache_data.clear()
