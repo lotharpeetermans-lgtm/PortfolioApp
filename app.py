@@ -880,17 +880,6 @@ msft = yf.Ticker("MSFT")
 
 st.write(msft.analyst_price_targets)
 
-st.write(
-    df[
-        [
-            "Naam",
-            "Ticker",
-            "Analistenadvies",
-            "Koersdoel"
-        ]
-    ].head(20)
-)
-
 df["Sector"] = df["Ticker"].apply(
     haal_sector
 )
