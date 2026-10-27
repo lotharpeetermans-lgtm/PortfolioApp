@@ -14,7 +14,8 @@ from auth import (
 from transactions import (
     voeg_transactie_toe,
     haal_transacties_op,
-    bereken_posities
+    bereken_posities,
+    verrijk_posities_met_koersen
 )
 
 
@@ -1377,6 +1378,12 @@ with tab3:
         st.session_state.user_id
     )
 
+    posities_df = (
+        verrijk_posities_met_koersen(
+            posities_df
+    )
+)
+
     if posities_df.empty:
 
         st.info(
@@ -1386,10 +1393,25 @@ with tab3:
     else:
 
         st.dataframe(
-            posities_df,
-            hide_index=True,
-            use_container_width=True
-        )
+    posities_df.style.format(
+        {
+            "Gem. aankoopprijs":
+                "€ {:.2f}",
+            "Kostbasis":
+                "€ {:.2f}",
+            "Koers":
+                "€ {:.2f}",
+            "Marktwaarde":
+                "€ {:.2f}",
+            "Winst/Verlies":
+                "€ {:.2f}",
+            "Rendement %":
+                "{:.2f}%"
+        }
+    ),
+    hide_index=True,
+    use_container_width=True
+)
 
 # ===================================
 # TAB 4
