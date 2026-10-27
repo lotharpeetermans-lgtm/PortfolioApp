@@ -877,6 +877,16 @@ df["Analistenadvies"] = df["Ticker"].apply(
 df["Koersdoel"] = df["Ticker"].apply(
     haal_koersdoel
 )
+st.write(
+    df[
+        [
+            "Naam",
+            "Ticker",
+            "Analistenadvies",
+            "Koersdoel"
+        ]
+    ].head(20)
+)
 
 df["Sector"] = df["Ticker"].apply(
     haal_sector
