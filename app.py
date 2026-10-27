@@ -1475,6 +1475,10 @@ with tab4:
             use_container_width=True
         )
 
+    else:
+
+        st.info("Momenteel geen koopkansen beschikbaar.")
+
     st.divider()
 
     # ==============================
@@ -1523,26 +1527,26 @@ with tab4:
     # ISIN-DATABASE
     # ==============================
 
-    st.subheader("📥 ISIN's importeren")
+    st.subheader("📚 ISIN-database")
 
-    csv_upload = st.file_uploader(
-        "Upload CSV met kolommen ISIN,Ticker",
-        type=["csv"],
-        key="isin_import"
+    ticker_df = pd.DataFrame(
+        [
+            {
+                "ISIN": isin,
+                "Ticker": ticker
+            }
+            for isin, ticker in tickers.items()
+        ]
     )
 
-    if csv_upload is not None:
+    if not ticker_df.empty:
 
-        try:
+        st.dataframe(
+            ticker_df.sort_values("Ticker"),
+            hide_index=True,
+            use_container_width=True
+        )
 
-            nieuwe_tickers = pd.read_csv(
-                csv_upload
-            )
-
-            toegevoegd = 0
-
-            for _, row in nieuwe_tickers.iterrows():
-
-                isin = str(
-                    row["ISIN"]
-                ).strip().upper()
+    st.download_button(
+        label="⬇️ Download ISIN-database",
+       
