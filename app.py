@@ -1508,9 +1508,7 @@ with tab4:
             use_container_width=True
         )
 
-    st.divider()
-    
-    st.download_button(
+        st.download_button(
             "⬇️ Download onbekende ISIN's",
             onbekende_df.to_csv(
                 index=False
@@ -1519,89 +1517,88 @@ with tab4:
             mime="text/csv"
         )
 
-# ==============================
-# ISIN-DATABASE
-# ==============================
+    st.divider()
 
-st.subheader("📚 ISIN-database")
+    # ==============================
+    # ISIN-DATABASE
+    # ==============================
 
-ticker_df = pd.DataFrame(
-    [
-        {
-            "ISIN": isin,
-            "Ticker": ticker
-        }
-        for isin, ticker in tickers.items()
-    ]
-)
+    st.subheader("📚 ISIN-database")
 
-if not ticker_df.empty:
-
-    st.dataframe(
-        ticker_df.sort_values("Ticker"),
-        hide_index=True,
-        use_container_width=True
+    ticker_df = pd.DataFrame(
+        [
+            {
+                "ISIN": isin,
+                "Ticker": ticker
+            }
+            for isin, ticker in tickers.items()
+        ]
     )
 
-st.download_button(
-    label="⬇️ Download ISIN-database",
-    data=json.dumps(
-        tickers,
-        indent=4
-    ),
-    file_name="tickers.json",
-    mime="application/json"
-)
+    if not ticker_df.empty:
 
-st.divider()
+        st.dataframe(
+            ticker_df.sort_values("Ticker"),
+            hide_index=True,
+            use_container_width=True
+        )
 
-st.subheader("📥 ISIN's importeren")
+    st.download_button(
+        label="⬇️ Download ISIN-database",
+        data=json.dumps(
+            tickers,
+            indent=4
+        ),
+        file_name="tickers.json",
+        mime="application/json"
+    )
 
-csv_upload = st.file_uploader(
-    "Upload CSV met kolommen ISIN,Ticker",
-    type=["csv"]
-)
+    st.divider()
 
-if csv_upload is not None:
+    # ==============================
+    # ISIN'S IMPORTEREN
+    # ==============================
 
-    try:
+    st.subheader("📥 ISIN's importeren")
 
-        nieuwe_tickers = pd.read_csv(csv_upload)
+    csv_upload = st.file_uploader(
+        "Upload CSV met kolommen ISIN,Ticker",
+        type=["csv"],
+        key="isin_import"
+    )
 
-        toegevoegd = 0
+    if csv_upload is not None:
 
-        for _, row in nieuwe_tickers.iterrows():
+        try:
 
-            isin = str(
-                row["ISIN"]
-            ).strip().upper()
-
-            ticker = str(
-                row["Ticker"]
-            ).strip().upper()
-
-            if isin and ticker:
-
-                tickers[isin] = ticker
-                toegevoegd += 1
-
-        with open(
-            "tickers.json",
-            "w"
-        ) as f:
-
-            json.dump(
-                tickers,
-                f,
-                indent=4
+            nieuwe_tickers = pd.read_csv(
+                csv_upload
             )
 
-        st.success(
-            f"{toegevoegd} tickers toegevoegd."
-        )
+            toegevoegd = 0
 
-    except Exception as e:
+            for _, row in nieuwe_tickers.iterrows():
 
-        st.error(
-            f"Fout bij importeren: {e}"
-        )
+                isin = str(
+                    row["ISIN"]
+                ).strip().upper()
+
+                ticker = str(
+                    row["Ticker"]
+                ).strip().upper()
+
+                if isin and ticker:
+
+                    tickers[isin] = ticker
+                    toegevoegd += 1
+
+            with open(
+                "tickers.json",
+                "w"
+            ) as f:
+
+                json.dump(
+                    tickers,
+                    f,
+                    indent=4
+                )
