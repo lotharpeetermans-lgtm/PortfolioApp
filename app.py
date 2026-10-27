@@ -129,7 +129,7 @@ if "user_id" not in st.session_state:
     st.stop()
 
 with st.expander("📥 Bolero import (optioneel)"):
- 
+
 uploaded_file = st.file_uploader(
 "Upload je Bolero-export",
 type=["xlsx"]
