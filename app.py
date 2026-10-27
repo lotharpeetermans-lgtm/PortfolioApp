@@ -135,43 +135,40 @@ with st.expander("📥 Bolero import (optioneel)"):
         type=["xlsx"]
     )
 
-# Alleen inlezen als er effectief een bestand is
-
 if uploaded_file is not None:
 
-df = pd.read_excel(
-uploaded_file
-)
+    df = pd.read_excel(
+        uploaded_file
+    )
 
 else:
 
-df = pd.DataFrame()
+    df = pd.DataFrame()
 
 st.title("📈 Beyond Beleggingen")
 
 if st.button("🔄 Portefeuille verversen"):
 
-st.cache_data.clear()
-st.rerun()
+    st.cache_data.clear()
+
+    st.rerun()
 
 st.caption(
-f"🕒 Laatst vernieuwd: "
-f"{datetime.now().strftime('%H:%M:%S')}"
+    f"🕒 Laatst vernieuwd: "
+    f"{datetime.now().strftime('%H:%M:%S')}"
 )
 
 if uploaded_file is not None:
 
-st.caption(
-f"📂 Actieve export: "
-f"{uploaded_file.name}"
-)
+    st.caption(
+        f"📂 Actieve export: {uploaded_file.name}"
+    )
 
 else:
 
-st.caption(
-"📂 Geen Bolero-export geladen"
-)
-Daarna zeer belangrijk
+    st.caption(
+        "📂 Geen Bolero-export geladen"
+    )
 
 # ===================================
 # BOLERO BESTAND INLEZEN
