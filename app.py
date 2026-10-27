@@ -332,6 +332,22 @@ with tab2:
             len(posities_df)
         )
 
+    st.divider()
+
+    st.dataframe(
+        posities_df[
+            [
+                "Ticker",
+                "Aantal",
+                "Koers",
+                "Marktwaarde",
+                "Winst/Verlies",
+                "Rendement %"
+            ]
+        ],
+        hide_index=True,
+        use_container_width=True
+    )
 # ===================================
 # TAB 3
 # ===================================
@@ -420,75 +436,49 @@ with tab4:
         st.subheader("🏆 Top winnaars")
 
         st.dataframe(
-            winnaars,
-            hide_index=True,
-            use_container_width=True
-        )
+            winnaars[
+                [
+                    "Ticker",
+                    "Rendement %",
+                    "Winst/Verlies"
+                ]
+            ],
 
         st.subheader("📉 Top verliezers")
 
-        st.dataframe(
-            verliezers,
-            hide_index=True,
-            use_container_width=True
-        )
+         st.dataframe(
+            verliezers[
+                [
+                    "Ticker",
+                    "Rendement %",
+                    "Winst/Verlies"
+                ]
+            ],
 # ===================================
 # TAB 5 - ADVIES
 # ===================================
 
 with tab5:
 
-    # ==============================
-    # KOMENDE EARNINGS
-    # ==============================
-
-    st.subheader("📅 Komende Earnings")
-
-    earnings_tabel = pd.DataFrame(
-        [
-            {"Ticker": ticker, "Datum": datum}
-            for ticker, datum in earnings_data.items()
-        ]
+    st.subheader(
+        "🏆 Top 10 Wereldwijde Koopkansen"
     )
-
-    st.dataframe(
-        earnings_tabel.sort_values("Datum"),
-        hide_index=True,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # ==============================
-    # TOP 10 KOOPKANSEN
-    # ==============================
-
-    st.subheader("🏆 Top 10 Wereldwijde Koopkansen")
 
     if not wereld_koopkansen.empty:
 
-        wereld_koopkansen_tabel = wereld_koopkansen[
-            [
-                "Ticker",
-                "Sector",
-                "Analistenadvies",
-                "Analisten",
-                "Koers",
-                "Koersdoel",
-                "Potentieel %",
-                "Koopscore",
-                "Yahoo"
-            ]
-        ]
-
         st.data_editor(
-            wereld_koopkansen_tabel,
-            column_config={
-                "Yahoo": st.column_config.LinkColumn(
-                    "📊 Yahoo Analyse",
-                    display_text="📈"
-                )
-            },
+            wereld_koopkansen[
+                [
+                    "Ticker",
+                    "Sector",
+                    "Analistenadvies",
+                    "Analisten",
+                    "Koers",
+                    "Koersdoel",
+                    "Potentieel %",
+                    "Koopscore"
+                ]
+            ],
             disabled=True,
             hide_index=True,
             use_container_width=True
@@ -499,34 +489,6 @@ with tab5:
         st.info(
             "Momenteel geen koopkansen beschikbaar."
         )
-
-    st.divider()
-
-    # ==============================
-    # ISIN-DATABASE
-    # ==============================
-
-    st.subheader("📚 ISIN-database")
-
-    ticker_df = pd.DataFrame(
-        [
-            {
-                "ISIN": isin,
-                "Ticker": ticker
-            }
-            for isin, ticker in tickers.items()
-        ]
-    )
-
-    if not ticker_df.empty:
-
-        st.dataframe(
-            ticker_df.sort_values("Ticker"),
-            hide_index=True,
-            use_container_width=True
-        )
-
-    st.divider()
 
 # ===================================
 # TAB 6 - INSTELLINGEN
