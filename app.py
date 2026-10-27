@@ -584,7 +584,9 @@ def bereken_wereldwijde_koopkansen():
 
         except Exception:
             pass
-
+            
+st.write("Aantal koopkansen:", len(koopkansen))
+    
     return pd.DataFrame(koopkansen)
 
 
