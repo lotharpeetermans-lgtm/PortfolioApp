@@ -1287,12 +1287,6 @@ else:
         "Nog geen transacties aanwezig."
     )
 
-    else:
-
-        st.info(
-            "Nog geen transacties aanwezig."
-        )
-
 # ===================================
 # TAB 2
 # ===================================
