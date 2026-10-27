@@ -503,48 +503,6 @@ with tab5:
     st.divider()
 
     # ==============================
-    # ONBEKENDE ISIN'S
-    # ==============================
-
-    st.subheader("⚠️ Onbekende ISIN's")
-
-    onbekende_df = df[
-        ~df["ISIN"]
-        .astype(str)
-        .str.strip()
-        .isin(tickers.keys())
-    ][["Naam", "ISIN"]].drop_duplicates()
-
-    if onbekende_df.empty:
-
-        st.success(
-            "✅ Alle ISIN's hebben een ticker."
-        )
-
-    else:
-
-        st.warning(
-            "Nieuwe aandelen/ETF's gevonden zonder ticker."
-        )
-
-        st.dataframe(
-            onbekende_df,
-            hide_index=True,
-            use_container_width=True
-        )
-
-        st.download_button(
-            "⬇️ Download onbekende ISIN's",
-            onbekende_df.to_csv(
-                index=False
-            ).encode("utf-8"),
-            file_name="onbekende_isins.csv",
-            mime="text/csv"
-        )
-
-    st.divider()
-
-    # ==============================
     # ISIN-DATABASE
     # ==============================
 
