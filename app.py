@@ -217,10 +217,34 @@ with tab1:
     st.subheader("📋 Transactiehistoriek")
 
     response = haal_transacties_op(
-        st.session_state.user_id
+    st.session_state.user_id
+)
+
+if response.data:
+
+    historiek_df = pd.DataFrame(
+        response.data
     )
 
-    
+    historiek_df = historiek_df.sort_values(
+        "datum",
+        ascending=False
+    )
+
+    for _, row in historiek_df.iterrows():
+
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(
+            [2, 2, 2, 2, 2, 2, 1]
+        )
+
+        col1.write(row["datum"])
+        col2.write(row["ticker"])
+        col3.write(row["type"])
+        col4.write(row["aantal"])
+        col5.write(f"€ {row['prijs']}")
+        col6.write(f"€ {row['kosten']}")
+
+        if col7.button(
             "🗑️",
             key=f"delete_{row['id']}"
         ):
@@ -240,6 +264,7 @@ else:
     st.info(
         "Nog geen transacties aanwezig."
     )
+
 
 # ===================================
 # TAB 2 - DASHBOARD
