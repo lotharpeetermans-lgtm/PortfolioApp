@@ -583,7 +583,7 @@ def bereken_wereldwijde_koopkansen():
     return pd.DataFrame(koopkansen)
 
 
-wereld_koopkansen = bereken_wereldwijde_koopkansen()
+wereld_koopkansen = pd.DataFrame()
 
 if (
     not wereld_koopkansen.empty
