@@ -134,7 +134,7 @@ uploaded_file = st.file_uploader(
 "Upload je Bolero-export",
 type=["xlsx"]
 )
- 
+
 # Alleen inlezen als er effectief een bestand is
 
 if uploaded_file is not None:
