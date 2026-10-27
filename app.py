@@ -130,10 +130,10 @@ if "user_id" not in st.session_state:
 
 with st.expander("📥 Bolero import (optioneel)"):
 
-uploaded_file = st.file_uploader(
-"Upload je Bolero-export",
-type=["xlsx"]
-)
+    uploaded_file = st.file_uploader(
+        "Upload je Bolero-export",
+        type=["xlsx"]
+    )
 
 # Alleen inlezen als er effectief een bestand is
 
