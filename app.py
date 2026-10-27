@@ -242,7 +242,7 @@ else:
     )
 
 # ===================================
-# TAB 2
+# TAB 2 - DASHBOARD
 # ===================================
 
 with tab2:
@@ -259,7 +259,9 @@ with tab2:
 
     if posities_df.empty:
 
-        st.info("Geen posities aanwezig.")
+        st.info(
+            "Geen posities aanwezig."
+        )
 
     else:
 
@@ -308,22 +310,26 @@ with tab2:
             len(posities_df)
         )
 
-    st.divider()
+        st.divider()
 
-    st.dataframe(
-        posities_df[
-            [
-                "Ticker",
-                "Aantal",
-                "Koers",
-                "Marktwaarde",
-                "Winst/Verlies",
-                "Rendement %"
-            ]
-        ],
-        hide_index=True,
-        use_container_width=True
-    )
+        st.subheader(
+            "📋 Overzicht posities"
+        )
+
+        st.dataframe(
+            posities_df[
+                [
+                    "Ticker",
+                    "Aantal",
+                    "Koers",
+                    "Marktwaarde",
+                    "Winst/Verlies",
+                    "Rendement %"
+                ]
+            ],
+            hide_index=True,
+            use_container_width=True
+        )
 # ===================================
 # TAB 3
 # ===================================
@@ -372,7 +378,7 @@ with tab3:
 )
 
 # ===================================
-# TAB 4
+# TAB 4 - ANALYSE
 # ===================================
 
 with tab4:
@@ -413,12 +419,13 @@ with tab4:
             .head(5)
         )
 
-        st.subheader("🏆 Top winnaars")
+        st.subheader("🏆 Top 5 winnaars")
 
         st.dataframe(
             winnaars[
                 [
                     "Ticker",
+                    "Aantal",
                     "Rendement %",
                     "Winst/Verlies"
                 ]
@@ -427,18 +434,34 @@ with tab4:
             use_container_width=True
         )
 
-        st.subheader("📉 Top verliezers")
+        st.divider()
+
+        st.subheader("📉 Top 5 verliezers")
 
         st.dataframe(
             verliezers[
                 [
                     "Ticker",
+                    "Aantal",
                     "Rendement %",
                     "Winst/Verlies"
                 ]
             ],
             hide_index=True,
             use_container_width=True
+        )
+
+        st.divider()
+
+        st.subheader("📊 Rendement per positie")
+
+        grafiek_df = (
+            posities_df
+            .set_index("Ticker")
+        )
+
+        st.bar_chart(
+            grafiek_df["Rendement %"]
         )
 # ===================================
 # TAB 5 - ADVIES
