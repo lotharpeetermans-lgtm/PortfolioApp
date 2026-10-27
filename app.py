@@ -1162,21 +1162,36 @@ def formatteer_tabel(df_style):
 # TABS
 # ===================================
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
     [
         "💰 Portefeuillebeheer",
         "📊 Dashboard",
-        "💼 Portefeuille",
+        "💼 Posities",
         "📈 Analyse",
-        "🤖 Koopkansen"
+        "🤖 Koopkansen",
+        "⚙️ Instellingen"
     ]
 )
 
 # ===================================
-# TAB 1
+# TAB 1 - PORTEFEUILLEBEHEER
 # ===================================
 
 with tab1:
+
+    st.subheader("💰 Portefeuillebeheer")
+
+    st.info(
+        "Binnenkort beheer je hier alle aankopen, "
+        "verkopen en transacties rechtstreeks vanuit "
+        "de database."
+    )
+
+# ===================================
+# TAB 2
+# ===================================
+
+with tab2:
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -1280,10 +1295,10 @@ with tab1:
     )
 
 # ===================================
-# TAB 2
+# TAB 3
 # ===================================
 
-with tab2:
+with tab3:
 
     aandelen_tab, etf_tab = st.tabs(
         [
@@ -1419,10 +1434,10 @@ with tab2:
     )
 
 # ===================================
-# TAB 3
+# TAB 4
 # ===================================
 
-with tab3:
+with tab4:
 
     st.subheader("🏆 Top 5 winnaars (%)")
 
@@ -1568,10 +1583,10 @@ earnings_data = {
 }
 
 # ===================================
-# TAB 4 - ADVIES
+# TAB 5 - ADVIES
 # ===================================
 
-with tab4:
+with tab5:
 
     # ==============================
     # KOMENDE EARNINGS
@@ -1705,3 +1720,25 @@ with tab4:
 
     st.divider()
 
+# ===================================
+# TAB 6 - INSTELLINGEN
+# ===================================
+
+with tab6:
+
+    st.subheader("⚙️ Instellingen")
+
+    st.info(
+        "Gebruikersinstellingen volgen binnenkort."
+    )
+
+    st.divider()
+
+    if st.button(
+        "🚪 Uitloggen",
+        key="logout_settings"
+    ):
+
+        st.session_state.clear()
+
+        st.rerun()
