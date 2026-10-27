@@ -1512,18 +1512,6 @@ with tab4:
             use_container_width=True
         )
 
-        json_data = json.dumps(
-    tickers,
-    indent=4
-)
-
-st.download_button(
-    label="⬇️ Download ISIN-database",
-    data=json_data,
-    file_name="tickers.json",
-    mime="application/json"
-)
-
     st.divider()
 
     # ==============================
@@ -1550,7 +1538,14 @@ st.download_button(
             use_container_width=True
         )
 
+    json_data = json.dumps(
+        tickers,
+        indent=4
+    )
+
     st.download_button(
         label="⬇️ Download ISIN-database",
+        data=json_data,
+        file_name="tickers.json",
+        mime="application/json"
     )
-       
