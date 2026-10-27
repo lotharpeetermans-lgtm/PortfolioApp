@@ -876,6 +876,14 @@ df["Analistenadvies"] = df["Ticker"].apply(
 
 st.write(yf.Ticker("MSFT").info)
 
+info = yf.Ticker("MSFT").info
+
+st.write({
+    "recommendationKey": info.get("recommendationKey"),
+    "targetMeanPrice": info.get("targetMeanPrice"),
+    "numberOfAnalystOpinions": info.get("numberOfAnalystOpinions")
+})
+
 st.write(
     df[
         [
