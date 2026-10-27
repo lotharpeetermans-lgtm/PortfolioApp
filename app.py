@@ -537,12 +537,11 @@ def bereken_wereldwijde_koopkansen():
 
             sector = info.get("sector")
 
-            if (
-                koersdoel is None
-                or koers is None
-                or koers <= 0
-            ):
+            if koers is None or koers <= 0:
                 continue
+
+            if koersdoel is None:
+                koersdoel = koers
 
             potentieel = round(
                 ((koersdoel - koers) / koers) * 100,
@@ -562,8 +561,8 @@ def bereken_wereldwijde_koopkansen():
                 advies_txt = "🟡 Houden"
 
             else:
-                score = 0
-                advies_txt = "🔴 Verkopen"
+                score = 50
+                advies_txt = "⚪ Geen advies"
 
             score += potentieel
 
@@ -584,13 +583,11 @@ def bereken_wereldwijde_koopkansen():
 
         except Exception:
             pass
-            
-st.write("Aantal koopkansen:", len(koopkansen))
-    
+
     return pd.DataFrame(koopkansen)
 
 
-wereld_koopkansen = pd.DataFrame()
+wereld_koopkansen = bereken_wereldwijde_koopkansen()
 
 if (
     not wereld_koopkansen.empty
