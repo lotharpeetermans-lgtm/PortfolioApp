@@ -187,9 +187,10 @@ def verrijk_posities_met_koersen(posities_df):
     posities_df["Winst/Verlies"] = winst_verlies
     posities_df["Rendement %"] = rendement
 
-    return posities_df
+        return posities_df
 
-    def verwijder_transactie(transactie_id):
+
+def verwijder_transactie(transactie_id):
 
     return (
         supabase
