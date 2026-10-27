@@ -964,28 +964,39 @@ df["Koopscore"] = df.apply(
 # TABELFORMATTERING
 # ===================================
 
-def formatteer_tabel(df_style):
+def euro(x):
+    if pd.isna(x):
+        return "-"
+    return f"€ {x:.2f}"
 
-    return (
-        df_style
-        .format({
-            "Waarde in EUR": "€ {:.2f}",
-            "Totale aankoopwaarde": "€ {:.2f}",
-            "Gem. aankoopkoers": "{:.2f}",
-            "Koers": "{:.2f}",
-            "Realtime koers": "{:.2f}",
-            "Dag %": "{:.2f} %",
-            "Gewicht %": "{:.2f} %",
-            "Rendement %": "{:.2f} %",
-            "Realtime rendement %": "{:.2f} %",
-            "Winst/Verlies €": "€ {:.2f}",
-            "Dividendrendement %": "{:.2f} %",
-            "Verwacht dividend €/jaar": "€ {:.2f}",
-            "Koersdoel": "{:.2f}",
-            "Potentieel %": "{:.1f} %",
-            "Koopscore": "{:.1f}"
-        })
-    )
+def nummer(x):
+    if pd.isna(x):
+        return "-"
+    return f"{x:.2f}"
+
+def percentage(x):
+    if pd.isna(x):
+        return "-"
+    return f"{x:.2f} %"
+
+def formatteer_tabel(df_style):
+    return df_style.format({
+        "Waarde in EUR": euro,
+        "Totale aankoopwaarde": euro,
+        "Gem. aankoopkoers": nummer,
+        "Koers": nummer,
+        "Realtime koers": nummer,
+        "Dag %": percentage,
+        "Gewicht %": percentage,
+        "Rendement %": percentage,
+        "Realtime rendement %": percentage,
+        "Winst/Verlies €": euro,
+        "Dividendrendement %": percentage,
+        "Verwacht dividend €/jaar": euro,
+        "Koersdoel": nummer,
+        "Potentieel %": lambda x: "-" if pd.isna(x) else f"{x:.1f} %",
+        "Koopscore": lambda x: "-" if pd.isna(x) else f"{x:.1f}"
+    })
 # ===================================
 # TABS
 # ===================================
