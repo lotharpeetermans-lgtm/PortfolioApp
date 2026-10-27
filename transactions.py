@@ -102,7 +102,6 @@ def bereken_posities(user_id):
                 "Ticker": ticker,
                 "Aantal": round(
                     open_aantal,
-                    2
                 ),
                 "Gem. aankoopprijs": round(
                     gemiddelde_prijs,
