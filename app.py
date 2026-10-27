@@ -1569,36 +1569,48 @@ with tab4:
 
     if csv_upload is not None:
 
-        try:
+    try:
 
-            nieuwe_tickers = pd.read_csv(
-                csv_upload
+        nieuwe_tickers = pd.read_csv(
+            csv_upload
+        )
+
+        toegevoegd = 0
+
+        for _, row in nieuwe_tickers.iterrows():
+
+            isin = str(
+                row["ISIN"]
+            ).strip().upper()
+
+            ticker = str(
+                row["Ticker"]
+            ).strip().upper()
+
+            if isin and ticker:
+
+                tickers[isin] = ticker
+                toegevoegd += 1
+
+        with open(
+            "tickers.json",
+            "w"
+        ) as f:
+
+            json.dump(
+                tickers,
+                f,
+                indent=4
             )
 
-            toegevoegd = 0
+        st.success(
+            f"{toegevoegd} tickers toegevoegd."
+        )
 
-            for _, row in nieuwe_tickers.iterrows():
+        st.rerun()
 
-                isin = str(
-                    row["ISIN"]
-                ).strip().upper()
+    except Exception as e:
 
-                ticker = str(
-                    row["Ticker"]
-                ).strip().upper()
-
-                if isin and ticker:
-
-                    tickers[isin] = ticker
-                    toegevoegd += 1
-
-            with open(
-                "tickers.json",
-                "w"
-            ) as f:
-
-                json.dump(
-                    tickers,
-                    f,
-                    indent=4
-                )
+        st.error(
+            f"Fout bij importeren: {e}"
+        )
