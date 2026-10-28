@@ -166,17 +166,6 @@ st.caption(
 # WERELDWIJDE KOOPKANSEN
 # ===================================
 
-from finnhub_client import (
-    haal_fundamentals_op
-)
-
-st.write(
-    haal_fundamentals_op(
-        "MSFT"
-    )
-)
-
-
 wereld_tickers = [
 
     # Mega Caps
@@ -270,7 +259,6 @@ def bereken_momentum_score(
     score = 0
 
     if len(hist) < 252:
-
         return score
 
     koers_6m = (
@@ -319,15 +307,8 @@ def bereken_relatieve_sterkte_score(
     hist
 ):
 
-    jaarhoog = (
-        hist["High"]
-        .max()
-    )
-
-    jaarlaag = (
-        hist["Low"]
-        .min()
-    )
+    jaarhoog = hist["High"].max()
+    jaarlaag = hist["Low"].min()
 
     if jaarhoog == jaarlaag:
         return 0
@@ -358,10 +339,7 @@ def bereken_terugval_score(
     hist
 ):
 
-    jaarhoog = (
-        hist["High"]
-        .max()
-    )
+    jaarhoog = hist["High"].max()
 
     korting = (
         (jaarhoog - koers)
@@ -420,7 +398,7 @@ def bereken_beyond_score(
             )
         )
 
-        relatieve_sterkte = (
+        sterkte = (
             bereken_relatieve_sterkte_score(
                 koers,
                 hist
@@ -435,10 +413,10 @@ def bereken_beyond_score(
         )
 
         totaal = (
-            trend
-            + momentum
-            + relatieve_sterkte
-            + terugval
+            trend +
+            momentum +
+            sterkte +
+            terugval
         )
 
         if totaal >= 80:
@@ -460,19 +438,12 @@ def bereken_beyond_score(
         return {
 
             "Ticker": ticker,
-
             "Beyond Score": totaal,
-
             "Label": label,
-
             "Trend": trend,
-
             "Momentum": momentum,
-
-            "Sterkte": relatieve_sterkte,
-
+            "Sterkte": sterkte,
             "Terugval": terugval,
-
             "Koers": round(
                 koers,
                 2
@@ -516,7 +487,7 @@ def bereken_wereldwijde_koopkansen():
             ascending=False
         )
     )
-   
+
 # ===================================
 # TABS
 # ===================================
