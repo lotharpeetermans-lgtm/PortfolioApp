@@ -619,54 +619,6 @@ with tab5:
         )
 
 # ===================================
-# TAB 5 - KOOPKANSEN
-# ===================================
-
-with tab5:
-
-    st.subheader(
-        "🏆 Top 10 Wereldwijde Koopkansen"
-    )
-
-    wereld_koopkansen = (
-        bereken_wereldwijde_koopkansen()
-    )
-
-    if wereld_koopkansen.empty:
-
-        st.info(
-            "Momenteel geen koopkansen beschikbaar."
-        )
-
-    else:
-
-        wereld_koopkansen = (
-            wereld_koopkansen
-            .sort_values(
-                "Koopscore",
-                ascending=False
-            )
-            .head(10)
-        )
-
-        st.dataframe(
-            wereld_koopkansen[
-                [
-                    "Ticker",
-                    "Sector",
-                    "Analistenadvies",
-                    "Analisten",
-                    "Koers",
-                    "Koersdoel",
-                    "Potentieel %",
-                    "Koopscore"
-                ]
-            ],
-            hide_index=True,
-            use_container_width=True
-        )
-
-# ===================================
 # TAB 6 - INSTELLINGEN
 # ===================================
 
