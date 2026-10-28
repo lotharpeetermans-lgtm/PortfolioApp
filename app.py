@@ -224,124 +224,29 @@ wereld_tickers = [
 ]
 
 
-def bereken_waardering_score(info):
+def bereken_trend_score(
+    koers,
+    hist
+):
 
     score = 0
 
-    forward_pe = info.get(
-        "forwardPE"
+    ma50 = (
+        hist["Close"]
+        .tail(50)
+        .mean()
     )
 
-    if forward_pe:
-
-        if forward_pe < 15:
-            score += 15
-
-        elif forward_pe < 20:
-            score += 12
-
-        elif forward_pe < 25:
-            score += 8
-
-        elif forward_pe < 35:
-            score += 4
-
-    peg = info.get(
-        "pegRatio"
+    ma200 = (
+        hist["Close"]
+        .mean()
     )
 
-    if peg:
+    if koers > ma50:
+        score += 15
 
-        if peg < 1:
-            score += 15
-
-        elif peg < 1.5:
-            score += 10
-
-        elif peg < 2:
-            score += 5
-
-    return score
-
-
-def bereken_kwaliteit_score(info):
-
-    score = 0
-
-    roe = info.get(
-        "returnOnEquity"
-    )
-
-    if roe:
-
-        roe *= 100
-
-        if roe > 20:
-            score += 10
-
-        elif roe > 15:
-            score += 8
-
-        elif roe > 10:
-            score += 5
-
-    marge = info.get(
-        "profitMargins"
-    )
-
-    if marge:
-
-        marge *= 100
-
-        if marge > 25:
-            score += 10
-
-        elif marge > 15:
-            score += 7
-
-        elif marge > 5:
-            score += 4
-
-    return score
-
-
-def bereken_groei_score(info):
-
-    score = 0
-
-    omzetgroei = info.get(
-        "revenueGrowth"
-    )
-
-    if omzetgroei:
-
-        omzetgroei *= 100
-
-        if omzetgroei > 15:
-            score += 10
-
-        elif omzetgroei > 10:
-            score += 7
-
-        elif omzetgroei > 5:
-            score += 4
-
-    winstgroei = info.get(
-        "earningsGrowth"
-    )
-
-    if winstgroei:
-
-        winstgroei *= 100
-
-        if winstgroei > 20:
-            score += 10
-
-        elif winstgroei > 10:
-            score += 7
-
-        elif winstgroei > 0:
-            score += 4
+    if koers > ma200:
+        score += 15
 
     return score
 
@@ -351,52 +256,121 @@ def bereken_momentum_score(
     hist
 ):
 
-    if hist.empty:
-
-        return 0
-
     score = 0
 
-    jaarhoog = hist["High"].max()
-    jaarlaag = hist["Low"].min()
+    if len(hist) < 252:
 
-    if jaarhoog > jaarlaag:
+        return score
 
-        positie = (
-            (koers - jaarlaag)
-            /
-            (jaarhoog - jaarlaag)
-        ) * 100
+    koers_6m = (
+        hist["Close"]
+        .iloc[-126]
+    )
 
-        if positie > 70:
-            score += 10
+    koers_12m = (
+        hist["Close"]
+        .iloc[0]
+    )
 
-        elif positie > 50:
-            score += 7
+    rendement_6m = (
+        (koers - koers_6m)
+        / koers_6m
+    ) * 100
 
-        elif positie > 30:
-            score += 4
+    rendement_12m = (
+        (koers - koers_12m)
+        / koers_12m
+    ) * 100
 
-    if len(hist) > 120:
+    if rendement_6m > 20:
+        score += 15
 
-        koers_6m = hist["Close"].iloc[-120]
+    elif rendement_6m > 10:
+        score += 10
 
-        rendement_6m = (
-            (koers - koers_6m)
-            /
-            koers_6m
-        ) * 100
+    elif rendement_6m > 0:
+        score += 5
 
-        if rendement_6m > 20:
-            score += 10
+    if rendement_12m > 30:
+        score += 15
 
-        elif rendement_6m > 10:
-            score += 7
+    elif rendement_12m > 15:
+        score += 10
 
-        elif rendement_6m > 0:
-            score += 4
+    elif rendement_12m > 0:
+        score += 5
 
     return score
+
+
+def bereken_relatieve_sterkte_score(
+    koers,
+    hist
+):
+
+    jaarhoog = (
+        hist["High"]
+        .max()
+    )
+
+    jaarlaag = (
+        hist["Low"]
+        .min()
+    )
+
+    if jaarhoog == jaarlaag:
+        return 0
+
+    positie = (
+        (koers - jaarlaag)
+        /
+        (jaarhoog - jaarlaag)
+    ) * 100
+
+    if positie > 80:
+        return 20
+
+    elif positie > 60:
+        return 15
+
+    elif positie > 40:
+        return 10
+
+    elif positie > 20:
+        return 5
+
+    return 0
+
+
+def bereken_terugval_score(
+    koers,
+    hist
+):
+
+    jaarhoog = (
+        hist["High"]
+        .max()
+    )
+
+    korting = (
+        (jaarhoog - koers)
+        / jaarhoog
+    ) * 100
+
+    if 10 <= korting <= 20:
+        return 20
+
+    elif 20 < korting <= 30:
+        return 15
+
+    elif 30 < korting <= 40:
+        return 10
+
+    elif korting > 40:
+        return 5
+
+    return 0
+
 
 def bereken_beyond_score(
     ticker
@@ -408,15 +382,6 @@ def bereken_beyond_score(
             ticker
         )
 
-        try:
-            info = aandeel.get_info()
-        except:
-            info = {}
-
-        if ticker == "MSFT":
-
-            st.write(sorted(info.keys()))
-
         koers = float(
             aandeel.fast_info[
                 "lastPrice"
@@ -427,21 +392,13 @@ def bereken_beyond_score(
             period="1y"
         )
 
-        waardering = (
-            bereken_waardering_score(
-                info
-            )
-        )
+        if hist.empty:
+            return None
 
-        kwaliteit = (
-            bereken_kwaliteit_score(
-                info
-            )
-        )
-
-        groei = (
-            bereken_groei_score(
-                info
+        trend = (
+            bereken_trend_score(
+                koers,
+                hist
             )
         )
 
@@ -452,22 +409,36 @@ def bereken_beyond_score(
             )
         )
 
+        relatieve_sterkte = (
+            bereken_relatieve_sterkte_score(
+                koers,
+                hist
+            )
+        )
+
+        terugval = (
+            bereken_terugval_score(
+                koers,
+                hist
+            )
+        )
+
         totaal = (
-            waardering
-            + kwaliteit
-            + groei
+            trend
             + momentum
+            + relatieve_sterkte
+            + terugval
         )
 
         if totaal >= 80:
 
             label = "🔥 Top koopkans"
 
-        elif totaal >= 70:
+        elif totaal >= 65:
 
             label = "✅ Koopwaardig"
 
-        elif totaal >= 60:
+        elif totaal >= 50:
 
             label = "👀 Interessant"
 
@@ -479,34 +450,29 @@ def bereken_beyond_score(
 
             "Ticker": ticker,
 
+            "Beyond Score": totaal,
+
+            "Label": label,
+
+            "Trend": trend,
+
+            "Momentum": momentum,
+
+            "Sterkte": relatieve_sterkte,
+
+            "Terugval": terugval,
+
             "Koers": round(
                 koers,
                 2
-            ),
-
-            "Waardering":
-                waardering,
-
-            "Kwaliteit":
-                kwaliteit,
-
-            "Groei":
-                groei,
-
-            "Momentum":
-                momentum,
-
-            "Beyond Score":
-                totaal,
-
-            "Label":
-                label
+            )
 
         }
 
     except Exception:
 
         return None
+
 
 def bereken_wereldwijde_koopkansen():
 
@@ -539,8 +505,7 @@ def bereken_wereldwijde_koopkansen():
             ascending=False
         )
     )
-
-
+   
 # ===================================
 # TABS
 # ===================================
