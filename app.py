@@ -139,7 +139,7 @@ if "user_id" not in st.session_state:
             key="register_password"
         )
 
-        ("📝 Account aanmaken"):
+        if st.button("📝 Account aanmaken"):
 
             try:
 
