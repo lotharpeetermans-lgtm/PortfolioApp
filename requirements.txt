@@ -6,3 +6,4 @@ openpyxl
 streamlit-calendar
 bcrypt
 supabase
+finnhub-python
