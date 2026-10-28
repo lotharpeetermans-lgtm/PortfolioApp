@@ -241,7 +241,26 @@ with tab1:
             col3.write(row["type"])
             col4.write(row["aantal"])
             col5.write(f"€ {row['prijs']}")
-            col6.write(f"€ {row['
+            col6.write(f"€ {row['kosten']}")
+
+            if col7.button(
+                "🗑️",
+                key=f"delete_{row['id']}"
+            ):
+
+                resultaat = verwijder_transactie(
+                    row["id"]
+                )
+
+                st.write(resultaat)
+
+                st.rerun()
+
+    else:
+
+        st.info(
+            "Nog geen transacties aanwezig."
+        )
 
 # ===================================
 # TAB 2 - DASHBOARD
