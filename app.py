@@ -16,6 +16,30 @@ from transactions import (
     verwijder_transactie
 )
 
+def score_range(
+    waarde,
+    grens1,
+    grens2,
+    grens3,
+    punten_max=10
+):
+
+    if waarde >= grens3:
+        return punten_max
+
+    elif waarde >= grens2:
+        return round(
+            punten_max * 0.75,
+            1
+        )
+
+    elif waarde >= grens1:
+        return round(
+            punten_max * 0.4,
+            1
+        )
+
+    return 0
 
 # ===================================
 # PAGINA
@@ -143,94 +167,372 @@ st.caption(
 # ===================================
 
 wereld_tickers = [
-    "MSFT",
-    "GOOGL",
-    "AMZN",
-    "META",
-    "NVDA",
-    "ASML",
-    "AMD",
-    "TSM",
-    "LVMUY",
-    "V"
+
+    # Mega Caps
+    "MSFT", "AAPL", "NVDA", "GOOGL", "AMZN",
+    "META", "TSLA", "AVGO", "LLY",
+
+    # Technologie
+    "AMD", "QCOM", "INTC", "CRM", "ADBE",
+    "NOW", "PLTR", "SNOW", "UBER", "SHOP",
+
+    # Chips
+    "ASML", "TSM", "AMAT", "LRCX", "MU",
+    "KLAC", "NXPI", "ON", "MRVL",
+
+    # Financieel
+    "V", "MA", "JPM", "BAC", "GS",
+    "MS", "BLK", "SCHW", "AXP",
+
+    # Gezondheidszorg
+    "JNJ", "ABBV", "MRK", "PFE",
+    "ABT", "ISRG", "TMO", "DHR",
+
+    # Industrie
+    "CAT", "GE", "HON", "DE",
+    "RTX", "LMT", "ETN", "PH",
+
+    # Consument
+    "PG", "KO", "PEP", "MCD",
+    "HD", "COST", "NKE", "SBUX",
+
+    # Energie
+    "XOM", "CVX", "SLB", "COP",
+
+    # Europa
+    "SAP", "SIE.DE",
+    "MC.PA", "RMS.PA",
+    "OR.PA", "AIR.PA",
+
+    # ETF's
+    "SPY", "VOO", "QQQ", "VTI",
+    "SCHD", "DGRO", "VIG",
+    "XLK", "XLF", "XLE",
+    "SOXX", "SMH",
+
+    # Wereld ETF's
+    "IWDA.AS",
+    "VWCE.DE",
+    "VWRL.AS",
+    "EUNL.DE",
+
+    # Dividend
+    "VHYL.AS",
+    "HDV",
+    "DVY",
+    "NOBL"
 ]
+
+
+def bereken_waardering_score(info):
+
+    score = 0
+
+    forward_pe = info.get(
+        "forwardPE"
+    )
+
+    if forward_pe:
+
+        if forward_pe < 15:
+            score += 15
+
+        elif forward_pe < 20:
+            score += 12
+
+        elif forward_pe < 25:
+            score += 8
+
+        elif forward_pe < 35:
+            score += 4
+
+    peg = info.get(
+        "pegRatio"
+    )
+
+    if peg:
+
+        if peg < 1:
+            score += 15
+
+        elif peg < 1.5:
+            score += 10
+
+        elif peg < 2:
+            score += 5
+
+    return score
+
+
+def bereken_kwaliteit_score(info):
+
+    score = 0
+
+    roe = info.get(
+        "returnOnEquity"
+    )
+
+    if roe:
+
+        roe *= 100
+
+        if roe > 20:
+            score += 10
+
+        elif roe > 15:
+            score += 8
+
+        elif roe > 10:
+            score += 5
+
+    marge = info.get(
+        "profitMargins"
+    )
+
+    if marge:
+
+        marge *= 100
+
+        if marge > 25:
+            score += 10
+
+        elif marge > 15:
+            score += 7
+
+        elif marge > 5:
+            score += 4
+
+    return score
+
+
+def bereken_groei_score(info):
+
+    score = 0
+
+    omzetgroei = info.get(
+        "revenueGrowth"
+    )
+
+    if omzetgroei:
+
+        omzetgroei *= 100
+
+        if omzetgroei > 15:
+            score += 10
+
+        elif omzetgroei > 10:
+            score += 7
+
+        elif omzetgroei > 5:
+            score += 4
+
+    winstgroei = info.get(
+        "earningsGrowth"
+    )
+
+    if winstgroei:
+
+        winstgroei *= 100
+
+        if winstgroei > 20:
+            score += 10
+
+        elif winstgroei > 10:
+            score += 7
+
+        elif winstgroei > 0:
+            score += 4
+
+    return score
+
+
+def bereken_momentum_score(
+    koers,
+    hist
+):
+
+    if hist.empty:
+
+        return 0
+
+    score = 0
+
+    jaarhoog = hist["High"].max()
+    jaarlaag = hist["Low"].min()
+
+    if jaarhoog > jaarlaag:
+
+        positie = (
+            (koers - jaarlaag)
+            /
+            (jaarhoog - jaarlaag)
+        ) * 100
+
+        if positie > 70:
+            score += 10
+
+        elif positie > 50:
+            score += 7
+
+        elif positie > 30:
+            score += 4
+
+    if len(hist) > 120:
+
+        koers_6m = hist["Close"].iloc[-120]
+
+        rendement_6m = (
+            (koers - koers_6m)
+            /
+            koers_6m
+        ) * 100
+
+        if rendement_6m > 20:
+            score += 10
+
+        elif rendement_6m > 10:
+            score += 7
+
+        elif rendement_6m > 0:
+            score += 4
+
+    return score
+
+def bereken_beyond_score(
+    ticker
+):
+
+    try:
+
+        aandeel = yf.Ticker(
+            ticker
+        )
+
+        info = aandeel.info
+
+        koers = float(
+            aandeel.fast_info[
+                "lastPrice"
+            ]
+        )
+
+        hist = aandeel.history(
+            period="1y"
+        )
+
+        waardering = (
+            bereken_waardering_score(
+                info
+            )
+        )
+
+        kwaliteit = (
+            bereken_kwaliteit_score(
+                info
+            )
+        )
+
+        groei = (
+            bereken_groei_score(
+                info
+            )
+        )
+
+        momentum = (
+            bereken_momentum_score(
+                koers,
+                hist
+            )
+        )
+
+        totaal = (
+            waardering
+            + kwaliteit
+            + groei
+            + momentum
+        )
+
+        if totaal >= 80:
+
+            label = "🔥 Top koopkans"
+
+        elif totaal >= 70:
+
+            label = "✅ Koopwaardig"
+
+        elif totaal >= 60:
+
+            label = "👀 Interessant"
+
+        else:
+
+            label = "⚠️ Opvolgen"
+
+        return {
+
+            "Ticker": ticker,
+
+            "Koers": round(
+                koers,
+                2
+            ),
+
+            "Waardering":
+                waardering,
+
+            "Kwaliteit":
+                kwaliteit,
+
+            "Groei":
+                groei,
+
+            "Momentum":
+                momentum,
+
+            "Beyond Score":
+                totaal,
+
+            "Label":
+                label
+
+        }
+
+    except Exception:
+
+        return None
 
 def bereken_wereldwijde_koopkansen():
 
     resultaten = []
 
-    for ticker_symbool in wereld_tickers:
+    for ticker in wereld_tickers:
 
-        try:
-
-            aandeel = yf.Ticker(
-                ticker_symbool
+        resultaat = (
+            bereken_beyond_score(
+                ticker
             )
+        )
 
-            koers = float(
-                aandeel.fast_info["lastPrice"]
-            )
-
-            hist = aandeel.history(
-                period="1y"
-            )
-
-            if hist.empty:
-                continue
-
-            jaarhoog = float(
-                hist["High"].max()
-            )
-
-            jaarlaag = float(
-                hist["Low"].min()
-            )
-
-            korting = (
-                (jaarhoog - koers)
-                / jaarhoog
-            ) * 100
-
-            koopscore = korting
+        if resultaat:
 
             resultaten.append(
-                {
-                    "Ticker": ticker_symbool,
-                    "Koers": round(
-                        koers,
-                        2
-                    ),
-                    "52W Hoog": round(
-                        jaarhoog,
-                        2
-                    ),
-                    "52W Laag": round(
-                        jaarlaag,
-                        2
-                    ),
-                    "Korting %": round(
-                        korting,
-                        2
-                    ),
-                    "Koopscore": round(
-                        koopscore,
-                        2
-                    )
-                }
+                resultaat
             )
 
-        except Exception:
-            continue
+    if not resultaten:
+
+        return pd.DataFrame()
 
     return (
         pd.DataFrame(
             resultaten
         )
         .sort_values(
-            "Koopscore",
+            "Beyond Score",
             ascending=False
         )
     )
+
 
 # ===================================
 # TABS
@@ -603,7 +905,18 @@ with tab5:
     else:
 
         st.dataframe(
-            wereld_koopkansen.head(25),
+            wereld_koopkansen[
+                [
+                    "Ticker",
+                    "Beyond Score",
+                    "Label",
+                    "Waardering",
+                    "Kwaliteit",
+                    "Groei",
+                    "Momentum",
+                    "Koers"
+               ]
+            ],
             hide_index=True,
             use_container_width=True
         )
