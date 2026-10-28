@@ -501,6 +501,10 @@ def bereken_beyond_score(
 
         return None
 
+if ticker == "MSFT":
+
+    st.write(info.keys())
+
 def bereken_wereldwijde_koopkansen():
 
     resultaten = []
