@@ -51,6 +51,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# ===================================
+# SESSION STATE
+# ===================================
+
+if "koopkansen_refresh" not in st.session_state:
+
+    st.session_state.koopkansen_refresh = 0
+
+# ===================================
+# LOGIN
+# ===================================
+
 if "user_id" not in st.session_state:
 
     st.title("📈 Beyond Beleggingen")
@@ -127,7 +139,7 @@ if "user_id" not in st.session_state:
             key="register_password"
         )
 
-        if st.button("📝 Account aanmaken"):
+        ("📝 Account aanmaken"):
 
             try:
 
@@ -154,6 +166,8 @@ st.title("📈 Beyond Beleggingen")
 if st.button("🔄 Portefeuille verversen"):
 
     st.cache_data.clear()
+
+    st.session_state.koopkansen_refresh += 1
 
     st.rerun()
 
@@ -508,9 +522,13 @@ def bereken_beyond_score(
 
         return None
 
-
-@st.cache_data(ttl=86400)
-def bereken_wereldwijde_koopkansen():
+@st.cache_data(
+    ttl=3600,
+    show_spinner="Wereldwijde koopkansen berekenen..."
+)
+def bereken_wereldwijde_koopkansen(
+    refresh_key=0
+):
 
     resultaten = []
 
@@ -901,7 +919,9 @@ with tab5:
     )
 
     wereld_koopkansen = (
-        bereken_wereldwijde_koopkansen()
+        bereken_wereldwijde_koopkansen(
+            st.session_state.koopkansen_refresh
+        )
     )
 
     if wereld_koopkansen.empty:
