@@ -882,12 +882,12 @@ with tab5:
                     "Ticker",
                     "Beyond Score",
                     "Label",
-                    "Waardering",
-                    "Kwaliteit",
-                    "Groei",
+                    "Trend",
                     "Momentum",
+                    "Sterkte",
+                    "Terugval",
                     "Koers"
-               ]
+                ]
             ],
             hide_index=True,
             use_container_width=True
