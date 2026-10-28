@@ -895,7 +895,7 @@ with tab5:
                     "Beyond Score",
                     "Label"
                 ]
-            ].head(10)
+            ].head(10),
             hide_index=True,
             use_container_width=True
         )
