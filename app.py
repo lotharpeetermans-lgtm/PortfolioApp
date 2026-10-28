@@ -252,9 +252,49 @@ def bereken_trend_score(
 
 
 def bereken_momentum_score(
-    koers,
-    hist
+    rendement_6m,
+    rendement_12m
 ):
+
+    score = 0
+
+    # 6 maanden
+
+    if rendement_6m > 75:
+
+        score += 15
+
+    elif rendement_6m > 40:
+
+        score += 12
+
+    elif rendement_6m > 20:
+
+        score += 10
+
+    elif rendement_6m > 0:
+
+        score += 5
+
+    # 12 maanden
+
+    if rendement_12m > 50:
+
+        score += 15
+
+    elif rendement_12m > 30:
+
+        score += 12
+
+    elif rendement_12m > 15:
+
+        score += 10
+
+    elif rendement_12m > 0:
+
+        score += 5
+
+    return score
 
     score = 0
 
@@ -418,10 +458,10 @@ def bereken_beyond_score(
 
         momentum = (
             bereken_momentum_score(
-                koers,
-                hist
+                rendement_6m,
+                rendement_12m
             )
-        )
+        )        
 
         sterkte = (
             bereken_relatieve_sterkte_score(
