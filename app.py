@@ -933,7 +933,7 @@ with tab5:
                     "Momentum",
                     "Sterkte",
                     "Terugval",
-                    "Koers"
+                    "Koers",
                     "6M Rendement",
                     "12M Rendement",
                     "52W Hoog",
