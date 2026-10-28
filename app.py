@@ -408,31 +408,14 @@ def bereken_beyond_score(
             ticker
         )
 
-        info = aandeel.info
+        try:
+            info = aandeel.get_info()
+        except:
+            info = {}
 
         if ticker == "MSFT":
 
-            st.json(
-                {
-                    "forwardPE":
-                        info.get("forwardPE"),
-
-                    "trailingPegRatio":
-                        info.get("trailingPegRatio"),
-
-                    "returnOnEquity":
-                        info.get("returnOnEquity"),
-
-                    "profitMargins":
-                        info.get("profitMargins"),
-
-                    "revenueGrowth":
-                        info.get("revenueGrowth"),
-
-                    "earningsGrowth":
-                        info.get("earningsGrowth")
-                }
-            )
+            st.write(sorted(info.keys()))
 
         koers = float(
             aandeel.fast_info[
