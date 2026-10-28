@@ -251,7 +251,300 @@ def bereken_trend_score(
     return score
 
 
-def bereken_momentum_score
+def bereken_momentum_score(
+    koers,
+    hist
+):
+
+    score = 0
+
+    if len(hist) < 252:
+        return score
+
+    koers_6m = (
+        hist["Close"]
+        .iloc[-126]
+    )
+
+    koers_12m = (
+        hist["Close"]
+        .iloc[0]
+    )
+
+    rendement_6m = (
+        (koers - koers_6m)
+        / koers_6m
+    ) * 100
+
+    rendement_12m = (
+        (koers - koers_12m)
+        / koers_12m
+    ) * 100
+
+    if rendement_6m > 20:
+        score += 15
+    elif rendement_6m > 10:
+        score += 10
+    elif rendement_6m > 0:
+        score += 5
+
+    if rendement_12m > 30:
+        score += 15
+    elif rendement_12m > 15:
+        score += 10
+    elif rendement_12m > 0:
+        score += 5
+
+    return score
+
+
+def bereken_relatieve_sterkte_score(
+    koers,
+    hist
+):
+
+    jaarhoog = hist["High"].max()
+    jaarlaag = hist["Low"].min()
+
+    if jaarhoog == jaarlaag:
+        return 0
+
+    positie = (
+        (koers - jaarlaag)
+        /
+        (jaarhoog - jaarlaag)
+    ) * 100
+
+    if positie > 80:
+        return 20
+    elif positie > 60:
+        return 15
+    elif positie > 40:
+        return 10
+    elif positie > 20:
+        return 5
+
+    return 0
+
+
+def bereken_terugval_score(
+    koers,
+    hist
+):
+
+    jaarhoog = hist["High"].max()
+
+    korting = (
+        (jaarhoog - koers)
+        / jaarhoog
+    ) * 100
+
+    if 10 <= korting <= 20:
+        return 20
+    elif 20 < korting <= 30:
+        return 15
+    elif 30 < korting <= 40:
+        return 10
+    elif korting > 40:
+        return 5
+
+    return 0
+
+
+def bereken_beyond_score(
+    ticker
+):
+
+    try:
+
+        aandeel = yf.Ticker(
+            ticker
+        )
+
+        koers = float(
+            aandeel.fast_info[
+                "lastPrice"
+            ]
+        )
+
+        hist = aandeel.history(
+            period="1y"
+        )
+
+        if hist.empty:
+            return None
+
+        jaarhoog = (
+            hist["High"]
+            .max()
+        )
+
+        jaarlaag = (
+            hist["Low"]
+            .min()
+        )
+
+        koers_6m = (
+            hist["Close"]
+            .iloc[-126]
+        )
+
+        koers_12m = (
+            hist["Close"]
+            .iloc[0]
+        )
+
+        rendement_6m = (
+            (koers - koers_6m)
+            / koers_6m
+        ) * 100
+
+        rendement_12m = (
+            (koers - koers_12m)
+            / koers_12m
+        ) * 100
+
+        afstand_tot_hoog = (
+            (jaarhoog - koers)
+            / jaarhoog
+        ) * 100
+
+        trend = (
+            bereken_trend_score(
+                koers,
+                hist
+            )
+        )
+
+        momentum = (
+            bereken_momentum_score(
+                koers,
+                hist
+            )
+        )
+
+        sterkte = (
+            bereken_relatieve_sterkte_score(
+                koers,
+                hist
+            )
+        )
+
+        terugval = (
+            bereken_terugval_score(
+                koers,
+                hist
+            )
+        )
+
+        totaal = (
+            trend +
+            momentum +
+            sterkte +
+            terugval
+        )
+
+        if totaal >= 80:
+
+            label = "🔥 Top koopkans"
+
+        elif totaal >= 65:
+
+            label = "✅ Koopwaardig"
+
+        elif totaal >= 50:
+
+            label = "👀 Interessant"
+
+        else:
+
+            label = "⚠️ Opvolgen"
+
+        return {
+
+            "Ticker": ticker,
+
+            "Beyond Score": totaal,
+
+            "Label": label,
+
+            "Trend": trend,
+
+            "Momentum": momentum,
+
+            "Sterkte": sterkte,
+
+            "Terugval": terugval,
+
+            "Koers": round(
+                koers,
+                2
+            ),
+
+            "6M Rendement": round(
+                rendement_6m,
+                2
+            ),
+
+            "12M Rendement": round(
+                rendement_12m,
+                2
+            ),
+
+            "52W Hoog": round(
+                jaarhoog,
+                2
+            ),
+
+            "52W Laag": round(
+                jaarlaag,
+                2
+            ),
+
+            "Afstand tot Hoog": round(
+                afstand_tot_hoog,
+                2
+            )
+
+        }
+
+    except Exception:
+
+        return None
+
+
+@st.cache_data(ttl=86400)
+def bereken_wereldwijde_koopkansen():
+
+    resultaten = []
+
+    for ticker in wereld_tickers:
+
+        resultaat = (
+            bereken_beyond_score(
+                ticker
+            )
+        )
+
+        if resultaat:
+
+            resultaten.append(
+                resultaat
+            )
+
+    if not resultaten:
+
+        return pd.DataFrame()
+
+    return (
+        pd.DataFrame(
+            resultaten
+        )
+        .sort_values(
+            "Beyond Score",
+            ascending=False
+        )
+    )
 
 # ===================================
 # TABS
