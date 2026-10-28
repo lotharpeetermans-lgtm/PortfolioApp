@@ -410,6 +410,10 @@ def bereken_beyond_score(
 
         info = aandeel.info
 
+        if ticker == "MSFT":
+
+            st.write(info)
+
         koers = float(
             aandeel.fast_info[
                 "lastPrice"
