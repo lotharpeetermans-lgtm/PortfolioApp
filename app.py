@@ -139,6 +139,102 @@ st.caption(
 )
 
 # ===================================
+# WERELDWIJDE KOOPKANSEN
+# ===================================
+
+wereld_tickers = [
+    "MSFT",
+    "GOOGL",
+    "AMZN",
+    "META",
+    "NVDA",
+    "ASML",
+    "AMD",
+    "TSM",
+    "LVMUY",
+    "V"
+]
+
+def bereken_wereldwijde_koopkansen():
+
+    resultaten = []
+
+    for ticker_symbool in wereld_tickers:
+
+        try:
+
+            aandeel = yf.Ticker(
+                ticker_symbool
+            )
+
+            info = aandeel.info
+
+            koers = info.get(
+                "currentPrice",
+                0
+            )
+
+            koersdoel = info.get(
+                "targetMeanPrice",
+                0
+            )
+
+            analisten = info.get(
+                "numberOfAnalystOpinions",
+                0
+            )
+
+            sector = info.get(
+                "sector",
+                "Onbekend"
+            )
+
+            potentieel = 0
+
+            if koers and koersdoel:
+
+                potentieel = (
+                    (koersdoel - koers)
+                    / koers
+                ) * 100
+
+            koopscore = (
+                potentieel
+                * (analisten / 10)
+            )
+
+            resultaten.append(
+                {
+                    "Ticker": ticker_symbool,
+                    "Sector": sector,
+                    "Koers": round(
+                        koers,
+                        2
+                    ),
+                    "Koersdoel": round(
+                        koersdoel,
+                        2
+                    ),
+                    "Analisten": analisten,
+                    "Potentieel %": round(
+                        potentieel,
+                        2
+                    ),
+                    "Koopscore": round(
+                        koopscore,
+                        2
+                    )
+                }
+            )
+
+        except Exception:
+            continue
+
+    return pd.DataFrame(
+        resultaten
+    )
+
+# ===================================
 # TABS
 # ===================================
 
@@ -493,12 +589,82 @@ with tab4:
 with tab5:
 
     st.subheader(
-        "🏆 Wereldwijde Koopkansen"
+        "🏆 Top Wereldwijde Koopkansen"
     )
 
-    st.info(
-        "Koopkansenmodule wordt momenteel herwerkt."
+    wereld_koopkansen = (
+        bereken_wereldwijde_koopkansen()
     )
+
+    if wereld_koopkansen.empty:
+
+        st.info(
+            "Momenteel geen koopkansen beschikbaar."
+        )
+
+    else:
+
+        wereld_koopkansen = (
+            wereld_koopkansen
+            .sort_values(
+                "Koopscore",
+                ascending=False
+            )
+        )
+
+        st.dataframe(
+            wereld_koopkansen,
+            hide_index=True,
+            use_container_width=True
+        )
+
+# ===================================
+# TAB 5 - KOOPKANSEN
+# ===================================
+
+with tab5:
+
+    st.subheader(
+        "🏆 Top 10 Wereldwijde Koopkansen"
+    )
+
+    wereld_koopkansen = (
+        bereken_wereldwijde_koopkansen()
+    )
+
+    if wereld_koopkansen.empty:
+
+        st.info(
+            "Momenteel geen koopkansen beschikbaar."
+        )
+
+    else:
+
+        wereld_koopkansen = (
+            wereld_koopkansen
+            .sort_values(
+                "Koopscore",
+                ascending=False
+            )
+            .head(10)
+        )
+
+        st.dataframe(
+            wereld_koopkansen[
+                [
+                    "Ticker",
+                    "Sector",
+                    "Analistenadvies",
+                    "Analisten",
+                    "Koers",
+                    "Koersdoel",
+                    "Potentieel %",
+                    "Koopscore"
+                ]
+            ],
+            hide_index=True,
+            use_container_width=True
+        )
 
 # ===================================
 # TAB 6 - INSTELLINGEN
