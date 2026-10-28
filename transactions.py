@@ -193,8 +193,7 @@ def verrijk_posities_met_koersen(posities_df):
 def verwijder_transactie(transactie_id):
 
     return (
-        supabase
-        .table("transactions")
+        supabase.table("transactions")
         .delete()
         .eq("id", transactie_id)
         .execute()
