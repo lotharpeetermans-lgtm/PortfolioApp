@@ -265,82 +265,34 @@ def bereken_momentum_score(
 
     # 6 maanden
 
-    if rendement_6m > 75:
-
+    if rendement_6m > 100:
         score += 15
 
-    elif rendement_6m > 40:
-
+    elif rendement_6m > 50:
         score += 12
 
     elif rendement_6m > 20:
-
         score += 10
 
     elif rendement_6m > 0:
-
         score += 5
 
     # 12 maanden
 
     if rendement_12m > 50:
-
         score += 15
 
-    elif rendement_12m > 30:
-
+    elif rendement_12m > 25:
         score += 12
 
-    elif rendement_12m > 15:
-
-        score += 10
+    elif rendement_12m > 10:
+        score += 8
 
     elif rendement_12m > 0:
-
-        score += 5
+        score += 4
 
     return score
 
-    score = 0
-
-    if len(hist) < 252:
-        return score
-
-    koers_6m = (
-        hist["Close"]
-        .iloc[-126]
-    )
-
-    koers_12m = (
-        hist["Close"]
-        .iloc[0]
-    )
-
-    rendement_6m = (
-        (koers - koers_6m)
-        / koers_6m
-    ) * 100
-
-    rendement_12m = (
-        (koers - koers_12m)
-        / koers_12m
-    ) * 100
-
-    if rendement_6m > 20:
-        score += 15
-    elif rendement_6m > 10:
-        score += 10
-    elif rendement_6m > 0:
-        score += 5
-
-    if rendement_12m > 30:
-        score += 15
-    elif rendement_12m > 15:
-        score += 10
-    elif rendement_12m > 0:
-        score += 5
-
-    return score
 
 
 def bereken_relatieve_sterkte_score(
@@ -370,7 +322,6 @@ def bereken_relatieve_sterkte_score(
         return 5
 
     return 0
-
 
 def bereken_terugval_score(
     koers,
