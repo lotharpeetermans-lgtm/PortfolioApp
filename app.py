@@ -223,13 +223,10 @@ wereld_tickers = [
     "NOBL"
 ]
 
-
 def bereken_trend_score(
     koers,
     hist
 ):
-
-    score = 0
 
     ma50 = (
         hist["Close"]
@@ -239,17 +236,25 @@ def bereken_trend_score(
 
     ma200 = (
         hist["Close"]
+        .tail(200)
         .mean()
     )
 
+    score = 0
+
     if koers > ma50:
-        score += 15
+
+        score += 10
 
     if koers > ma200:
-        score += 15
+
+        score += 10
+
+    if ma50 > ma200:
+
+        score += 10
 
     return score
-
 
 def bereken_momentum_score(
     rendement_6m,
