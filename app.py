@@ -252,6 +252,12 @@ with tab1:
                     row["id"]
                 )
 
+                st.write("ID:", row["id"])
+
+                resultaat = verwijder_transactie(
+                    row["id"]
+                )
+
                 st.write(resultaat)
 
                 st.rerun()
