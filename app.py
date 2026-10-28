@@ -248,26 +248,15 @@ with tab1:
                 key=f"delete_{row['id']}"
             ):
 
-                resultaat = verwijder_transactie(
-                    row["id"]
-                )
+            verwijder_transactie(
+                row["id"]
+            )
 
-                st.write("ID:", row["id"])
+            st.success(
+                "Transactie verwijderd."
+            )
 
-                resultaat = verwijder_transactie(
-                    row["id"]
-                )
-
-                st.write(resultaat)
-
-                st.rerun()
-
-    else:
-
-        st.info(
-            "Nog geen transacties aanwezig."
-        )
-
+            st.rerun()
 # ===================================
 # TAB 2 - DASHBOARD
 # ===================================
