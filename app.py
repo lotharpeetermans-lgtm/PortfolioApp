@@ -213,9 +213,9 @@ with tab1:
 
     st.divider()
 
-    st.subheader("📋 Transactiehistoriek")
+   st.subheader("📋 Transactiehistoriek")
 
-    response = haal_transacties_op(
+response = haal_transacties_op(
     st.session_state.user_id
 )
 
@@ -248,13 +248,11 @@ if response.data:
             key=f"delete_{row['id']}"
         ):
 
-            verwijder_transactie(
+            resultaat = verwijder_transactie(
                 row["id"]
             )
 
-            st.success(
-                "Transactie verwijderd."
-            )
+            st.write(resultaat)
 
             st.rerun()
 
@@ -263,7 +261,6 @@ else:
     st.info(
         "Nog geen transacties aanwezig."
     )
-
 
 # ===================================
 # TAB 2 - DASHBOARD
