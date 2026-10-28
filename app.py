@@ -169,10 +169,12 @@ def bereken_wereldwijde_koopkansen():
 
             info = aandeel.info
 
-            koers = info.get(
-                "currentPrice",
-                0
-            )
+            try:
+                koers = float(
+                    aandeel.fast_info["lastPrice"]
+                )
+            except:
+                koers = 0
 
             koersdoel = info.get(
                 "targetMeanPrice",
