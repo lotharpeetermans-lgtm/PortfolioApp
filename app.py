@@ -858,6 +858,13 @@ with tab5:
 
     else:
 
+        st.metric(
+            "Aantal gescreende aandelen/ETF's",
+            len(wereld_koopkansen)
+        )
+
+        st.divider()
+
         st.dataframe(
             wereld_koopkansen[
                 [
@@ -871,6 +878,24 @@ with tab5:
                     "Koers"
                 ]
             ],
+            hide_index=True,
+            use_container_width=True
+        )
+
+        st.divider()
+
+        st.subheader(
+            "🔥 Top 10 Koopkansen"
+        )
+
+        st.dataframe(
+            wereld_koopkansen[
+                [
+                    "Ticker",
+                    "Beyond Score",
+                    "Label"
+                ]
+            ].head(10)
             hide_index=True,
             use_container_width=True
         )
