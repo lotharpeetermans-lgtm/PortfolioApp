@@ -167,59 +167,49 @@ def bereken_wereldwijde_koopkansen():
                 ticker_symbool
             )
 
-            info = aandeel.info
-
-            try:
-                koers = float(
-                    aandeel.fast_info["lastPrice"]
-                )
-            except:
-                koers = 0
-
-            koersdoel = info.get(
-                "targetMeanPrice",
-                0
+            koers = float(
+                aandeel.fast_info["lastPrice"]
             )
 
-            analisten = info.get(
-                "numberOfAnalystOpinions",
-                0
+            hist = aandeel.history(
+                period="1y"
             )
 
-            sector = info.get(
-                "sector",
-                "Onbekend"
+            if hist.empty:
+                continue
+
+            jaarhoog = float(
+                hist["High"].max()
             )
 
-            potentieel = 0
-
-            if koers and koersdoel:
-
-                potentieel = (
-                    (koersdoel - koers)
-                    / koers
-                ) * 100
-
-            koopscore = (
-                potentieel
-                * (analisten / 10)
+            jaarlaag = float(
+                hist["Low"].min()
             )
+
+            korting = (
+                (jaarhoog - koers)
+                / jaarhoog
+            ) * 100
+
+            koopscore = korting
 
             resultaten.append(
                 {
                     "Ticker": ticker_symbool,
-                    "Sector": sector,
                     "Koers": round(
                         koers,
                         2
                     ),
-                    "Koersdoel": round(
-                        koersdoel,
+                    "52W Hoog": round(
+                        jaarhoog,
                         2
                     ),
-                    "Analisten": analisten,
-                    "Potentieel %": round(
-                        potentieel,
+                    "52W Laag": round(
+                        jaarlaag,
+                        2
+                    ),
+                    "Korting %": round(
+                        korting,
                         2
                     ),
                     "Koopscore": round(
@@ -232,8 +222,14 @@ def bereken_wereldwijde_koopkansen():
         except Exception:
             continue
 
-    return pd.DataFrame(
-        resultaten
+    return (
+        pd.DataFrame(
+            resultaten
+        )
+        .sort_values(
+            "Koopscore",
+            ascending=False
+        )
     )
 
 # ===================================
@@ -591,7 +587,7 @@ with tab4:
 with tab5:
 
     st.subheader(
-        "🏆 Top Wereldwijde Koopkansen"
+        "🏆 Beste Koopkansen Wereldwijd"
     )
 
     wereld_koopkansen = (
@@ -601,21 +597,13 @@ with tab5:
     if wereld_koopkansen.empty:
 
         st.info(
-            "Momenteel geen koopkansen beschikbaar."
+            "Geen koopkansen gevonden."
         )
 
     else:
 
-        wereld_koopkansen = (
-            wereld_koopkansen
-            .sort_values(
-                "Koopscore",
-                ascending=False
-            )
-        )
-
         st.dataframe(
-            wereld_koopkansen,
+            wereld_koopkansen.head(25),
             hide_index=True,
             use_container_width=True
         )
