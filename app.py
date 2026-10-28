@@ -166,6 +166,17 @@ st.caption(
 # WERELDWIJDE KOOPKANSEN
 # ===================================
 
+from finnhub_client import (
+    haal_fundamentals_op
+)
+
+st.write(
+    haal_fundamentals_op(
+        "MSFT"
+    )
+)
+
+
 wereld_tickers = [
 
     # Mega Caps
