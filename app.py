@@ -536,7 +536,8 @@ def bereken_beyond_score(
             trend +
             momentum +
             sterkte +
-            terugval
+            terugval +
+            fundamenteel
         )
 
         if totaal >= 80:
@@ -571,6 +572,22 @@ def bereken_beyond_score(
 
             "Terugval": terugval,
 
+            "Fundamenteel": fundamenteel,
+
+            "PE": fundamentals.get("pe"),
+
+            "PEG": fundamentals.get("peg"),
+
+            "ROE": fundamentals.get("roe"),
+
+            "Revenue Growth": fundamentals.get(
+                "revenue_growth"
+            ),
+
+            "EPS Growth": fundamentals.get(
+                "eps_growth"
+            ),
+
             "Koers": round(
                 koers,
                 2
@@ -588,7 +605,7 @@ def bereken_beyond_score(
 
             "52W Hoog": round(
                 jaarhoog,
-                2
+                2        
             ),
 
             "52W Laag": round(
@@ -599,9 +616,10 @@ def bereken_beyond_score(
             "Afstand tot Hoog": round(
                 afstand_tot_hoog,
                 2
-            )
+            )    
 
         }
+
 
     except Exception:
 
@@ -1040,6 +1058,12 @@ with tab5:
                     "52W Hoog",
                     "52W Laag",
                     "Afstand tot Hoog"
+                    "Fundamenteel",
+                    "PE",
+                    "PEG",
+                    "ROE",
+                    "Revenue Growth",
+                    "EPS Growth",
                 ]
             ],
             hide_index=True,
