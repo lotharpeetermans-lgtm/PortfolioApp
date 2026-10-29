@@ -1057,7 +1057,7 @@ with tab5:
                     "12M Rendement",
                     "52W Hoog",
                     "52W Laag",
-                    "Afstand tot Hoog"
+                    "Afstand tot Hoog",
                     "Fundamenteel",
                     "PE",
                     "PEG",
