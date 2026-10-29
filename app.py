@@ -371,6 +371,7 @@ def haal_fundamentals_op(ticker):
         )
 
         if ticker == "MSFT":
+            st.error("MSFT gevonden")
             st.json(data)
            
 
