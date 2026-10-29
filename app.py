@@ -360,10 +360,7 @@ def bereken_terugval_score(
 
     return 0
 
-@st.cache_data(ttl=86400)
 def haal_fundamentals_op(ticker):
-
-    st.error(f"haal_fundamentals_op: {ticker}")
     
     try:
 
@@ -467,6 +464,8 @@ def bereken_beyond_score(
             period="1y"
         )
 
+        st.write(f"Bezig met {ticker}")
+        
         fundamentals = haal_fundamentals_op(
             ticker
         )
