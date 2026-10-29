@@ -68,14 +68,6 @@ if "user_id" not in st.session_state:
     st.title("📈 Beyond Beleggingen")
 
     col1, col2 = st.columns([8, 1])
-
-    with col2:
-
-        if st.button("🚪 Uitloggen"):
-
-            st.session_state.clear()
-
-            st.rerun()
     
     login_tab, register_tab = st.tabs(
         [
@@ -394,16 +386,12 @@ def bereken_beyond_score(
             .min()
         )
 
-        koers_6m = (
-            hist["Close"]
-            .iloc[-126]
-        )
+        if len(hist) < 126:
+            return None
 
-        koers_12m = (
-            hist["Close"]
-            .iloc[0]
-        )
-
+        koers_6m = hist["Close"].iloc[-126]
+        koers_12m = hist["Close"].iloc[0]
+        
         rendement_6m = (
             (koers - koers_6m)
             / koers_6m
