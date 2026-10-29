@@ -16,6 +16,14 @@ from transactions import (
     verwijder_transactie
 )
 
+import finnhub
+
+FINNHUB_API_KEY = st.secrets["FINNHUB_API_KEY"]
+
+finnhub_client = finnhub.Client(
+    api_key=FINNHUB_API_KEY
+)
+
 def score_range(
     waarde,
     grens1,
@@ -352,6 +360,85 @@ def bereken_terugval_score(
 
     return 0
 
+@st.cache_data(ttl=86400)
+def haal_fundamentals_op(ticker):
+
+    try:
+
+        data = finnhub_client.company_basic_financials(
+            ticker,
+            "all"
+        )
+
+        metrics = data.get(
+            "metric",
+            {}
+        )
+
+        return {
+            "pe": metrics.get("peTTM"),
+            "peg": metrics.get("pegRatio"),
+            "roe": metrics.get("roeTTM"),
+            "net_margin": metrics.get("netMargin"),
+            "revenue_growth": metrics.get("revenueGrowthTTMYoy"),
+            "eps_growth": metrics.get("epsGrowthTTMYoy")
+        }
+
+    except Exception:
+
+        return {}
+
+def bereken_fundamentele_score(data):
+
+    score = 0
+
+    pe = data.get("pe")
+    peg = data.get("peg")
+    roe = data.get("roe")
+    revenue_growth = data.get("revenue_growth")
+    eps_growth = data.get("eps_growth")
+
+    # PEG
+
+    if peg:
+
+        if peg < 1:
+            score += 15
+
+        elif peg < 2:
+            score += 10
+
+    # ROE
+
+    if roe:
+
+        if roe > 20:
+            score += 15
+
+        elif roe > 10:
+            score += 10
+
+    # Omzetgroei
+
+    if revenue_growth:
+
+        if revenue_growth > 20:
+            score += 10
+
+        elif revenue_growth > 10:
+            score += 5
+
+    # Winstgroei
+
+    if eps_growth:
+
+        if eps_growth > 20:
+            score += 10
+
+        elif eps_growth > 10:
+            score += 5
+
+    return score
 
 def bereken_beyond_score(
     ticker
@@ -371,6 +458,16 @@ def bereken_beyond_score(
 
         hist = aandeel.history(
             period="1y"
+        )
+
+        fundamentals = haal_fundamentals_op(
+            ticker
+        )
+
+        fundamenteel = (
+            bereken_fundamentele_score(
+                fundamentals
+            )
         )
 
         if hist.empty:
