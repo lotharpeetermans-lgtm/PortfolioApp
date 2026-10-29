@@ -1040,6 +1040,9 @@ with tab5:
             len(wereld_koopkansen)
         )
 
+        st.write("Beschikbare kolommen:")
+        st.write(wereld_koopkansen.columns.tolist())
+
         st.divider()
 
         st.dataframe(
@@ -1075,7 +1078,7 @@ with tab5:
         st.subheader(
             "🔥 Top 10 Koopkansen"
         )
-
+        
         st.dataframe(
             wereld_koopkansen[
                 [
