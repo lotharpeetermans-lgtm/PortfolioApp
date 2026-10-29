@@ -370,9 +370,10 @@ def haal_fundamentals_op(ticker):
             "all"
         )
 
-       if ticker == "MSFT":
+        if ticker == "MSFT":
             st.write("MSFT raw data")
             st.json(data)
+            st.stop()
 
         metrics = data.get(
             "metric",
