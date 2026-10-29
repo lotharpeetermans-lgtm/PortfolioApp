@@ -363,6 +363,8 @@ def bereken_terugval_score(
 @st.cache_data(ttl=86400)
 def haal_fundamentals_op(ticker):
 
+    st.error(f"haal_fundamentals_op: {ticker}")
+    
     try:
 
         data = finnhub_client.company_basic_financials(
