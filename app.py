@@ -361,37 +361,15 @@ def bereken_terugval_score(
     return 0
 
 def haal_fundamentals_op(ticker):
-    
-    try:
 
-        data = finnhub_client.company_basic_financials(
-            ticker,
-            "all"
-        )
-
-        if ticker == "MSFT":
-            st.error("MSFT gevonden")
-            st.json(data)
-           
-
-        metrics = data.get(
-            "metric",
-            {}
-        )
-
-        return {
-            "pe": metrics.get("peTTM"),
-            "peg": metrics.get("pegRatio"),
-            "roe": metrics.get("roeTTM"),
-            "net_margin": metrics.get("netMargin"),
-            "revenue_growth": metrics.get("revenueGrowthTTMYoy"),
-            "eps_growth": metrics.get("epsGrowthTTMYoy")
-        }
-
-    except Exception as e:
-        st.error(f"Finnhub fout {ticker}: {e}")
-        return {}
-
+    return {
+        "pe": None,
+        "peg": None,
+        "roe": None,
+        "net_margin": None,
+        "revenue_growth": None,
+        "eps_growth": None
+    }
 def bereken_fundamentele_score(data):
 
     score = 0
@@ -450,34 +428,24 @@ def bereken_beyond_score(
 
     try:
 
-        aandeel = yf.Ticker(
-            ticker
-        )
-
-        koers = float(
-            aandeel.fast_info[
-                "lastPrice"
-            ]
-        )
+        aandeel = yf.Ticker(ticker)
 
         hist = aandeel.history(
             period="1y"
         )
 
-        st.write(f"Bezig met {ticker}")
-        
+        if hist.empty:
+            return None
+
+        koers = float(
+            hist["Close"].iloc[-1]
+        )
+
         fundamentals = haal_fundamentals_op(
             ticker
         )
 
-        fundamenteel = (
-            bereken_fundamentele_score(
-                fundamentals
-            )
-        )
-
-        if hist.empty:
-            return None
+        fundamenteel = 0
 
         jaarhoog = (
             hist["High"]
@@ -578,22 +546,6 @@ def bereken_beyond_score(
 
             "Terugval": terugval,
 
-            "Fundamenteel": fundamenteel,
-
-            "PE": fundamentals.get("pe"),
-
-            "PEG": fundamentals.get("peg"),
-
-            "ROE": fundamentals.get("roe"),
-
-            "Revenue Growth": fundamentals.get(
-                "revenue_growth"
-            ),
-
-            "EPS Growth": fundamentals.get(
-                "eps_growth"
-            ),
-
             "Koers": round(
                 koers,
                 2
@@ -611,7 +563,7 @@ def bereken_beyond_score(
 
             "52W Hoog": round(
                 jaarhoog,
-                2        
+                2
             ),
 
             "52W Laag": round(
@@ -622,10 +574,8 @@ def bereken_beyond_score(
             "Afstand tot Hoog": round(
                 afstand_tot_hoog,
                 2
-            )    
-
+            )
         }
-
 
     except Exception as e:
         st.error(f"{ticker}: {e}")
@@ -1045,9 +995,6 @@ with tab5:
             "Aantal gescreende aandelen/ETF's",
             len(wereld_koopkansen)
         )
-
-        st.write("Beschikbare kolommen:")
-        st.write(wereld_koopkansen.columns.tolist())
 
         st.divider()
 
