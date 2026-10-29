@@ -1066,12 +1066,6 @@ with tab5:
                     "52W Hoog",
                     "52W Laag",
                     "Afstand tot Hoog",
-                    "Fundamenteel",
-                    "PE",
-                    "PEG",
-                    "ROE",
-                    "Revenue Growth",
-                    "EPS Growth",
                 ]
             ],
             hide_index=True,
