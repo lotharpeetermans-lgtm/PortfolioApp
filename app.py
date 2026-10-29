@@ -18,6 +18,13 @@ from transactions import (
 
 from finnhub_client import finnhub_client
 
+st.write(
+    finnhub_client.company_profile2(
+        symbol="MSFT"
+    )
+)
+
+
 def score_range(
     waarde,
     grens1,
