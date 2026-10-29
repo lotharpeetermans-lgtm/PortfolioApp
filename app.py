@@ -370,6 +370,10 @@ def haal_fundamentals_op(ticker):
             "all"
         )
 
+        if ticker == "MSFT":
+            st.write("MSFT fundamentals")
+            st.write(fundamentals)
+
         metrics = data.get(
             "metric",
             {}
@@ -384,8 +388,8 @@ def haal_fundamentals_op(ticker):
             "eps_growth": metrics.get("epsGrowthTTMYoy")
         }
 
-    except Exception:
-
+    except Exception as e:
+        st.error(f"Finnhub fout {ticker}: {e}")
         return {}
 
 def bereken_fundamentele_score(data):
@@ -621,8 +625,8 @@ def bereken_beyond_score(
         }
 
 
-    except Exception:
-
+    except Exception as e:
+        st.error(f"{ticker}: {e}")
         return None
 
 @st.cache_data(
