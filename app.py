@@ -901,9 +901,7 @@ with tab4:
 # ===================================
 
 with tab5:
-    st.subheader("Test")
-    st.write("Koopkansen tijdelijk uitgeschakeld")
-
+    
     st.subheader(
         "🏆 Beste Koopkansen Wereldwijd"
     )
