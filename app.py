@@ -16,13 +16,7 @@ from transactions import (
     verwijder_transactie
 )
 
-import finnhub
-
-FINNHUB_API_KEY = st.secrets["FINNHUB_API_KEY"]
-
-finnhub_client = finnhub.Client(
-    api_key=FINNHUB_API_KEY
-)
+from finnhub_client import finnhub_client
 
 def score_range(
     waarde,
