@@ -532,6 +532,18 @@ def bereken_beyond_score(
 
             "Terugval": terugval,
 
+            "Funda Score": fundamenteel,
+
+            "PE": fundamentals.get("pe"),
+
+            "PEG": fundamentals.get("peg"),
+
+            "ROE": fundamentals.get("roe"),
+
+            "Revenue Growth": fundamentals.get("revenue_growth"),
+
+            "EPS Growth": fundamentals.get("eps_growth"),
+
             "Koers": round(
                 koers,
                 2
