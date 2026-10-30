@@ -978,6 +978,10 @@ with tab5:
         "🏆 Beste Koopkansen Wereldwijd"
     )
 
+    st.write(
+        haal_fundamentals_op("MSFT")
+    )        
+
     wereld_koopkansen = (
         bereken_wereldwijde_koopkansen(
             st.session_state.koopkansen_refresh
