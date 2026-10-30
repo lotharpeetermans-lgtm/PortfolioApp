@@ -25,5 +25,7 @@ def haal_fundamentals_op(ticker):
             "eps_growth": metrics.get("epsGrowth3Y")
         }
 
-    except Exception:
-        return {}
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
