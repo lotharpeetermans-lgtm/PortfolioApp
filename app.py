@@ -429,6 +429,9 @@ def bereken_beyond_score(
             ticker
         )
 
+        if ticker == "MSFT":
+            st.json(fundamentals)
+
         fundamenteel = bereken_fundamentele_score(
             fundamentals
         )
