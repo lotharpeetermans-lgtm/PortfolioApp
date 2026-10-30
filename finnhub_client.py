@@ -9,7 +9,7 @@ def haal_fundamentals_op(ticker):
 
     try:
 
-        data = client.company_basic_financials(
+        data = finnhub_client.company_basic_financials(
             ticker,
             "all"
         )
