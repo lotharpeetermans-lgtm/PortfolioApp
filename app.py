@@ -17,14 +17,6 @@ from transactions import (
 )
 
 from finnhub_client import haal_fundamentals_op
-fundamentals = haal_fundamentals_op(ticker)
-
-st.write(
-    finnhub_client.company_profile2(
-        symbol="MSFT"
-    )
-)
-
 
 def score_range(
     waarde,
@@ -362,16 +354,6 @@ def bereken_terugval_score(
 
     return 0
 
-def haal_fundamentals_op(ticker):
-
-    return {
-        "pe": None,
-        "peg": None,
-        "roe": None,
-        "net_margin": None,
-        "revenue_growth": None,
-        "eps_growth": None
-    }
 def bereken_fundamentele_score(data):
 
     score = 0
@@ -447,7 +429,9 @@ def bereken_beyond_score(
             ticker
         )
 
-        fundamenteel = 0
+        fundamenteel = bereken_fundamentele_score(
+            fundamentals
+        )
 
         jaarhoog = (
             hist["High"]
