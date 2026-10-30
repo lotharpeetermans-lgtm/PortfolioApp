@@ -529,19 +529,19 @@ def bereken_beyond_score(
 
         elif totaal >= 85:
 
-    label = "🔥 Top koopkans"
+            label = "🔥 Top koopkans"
 
         elif totaal >= 70:
 
-    label = "✅ Koopwaardig"
+            label = "✅ Koopwaardig"
 
         elif totaal >= 55:
 
-    label = "👀 Interessant"
+            label = "👀 Interessant"
 
         else:
 
-    label = "⚠️ Opvolgen"
+            label = "⚠️ Opvolgen"
 
         return {
 
