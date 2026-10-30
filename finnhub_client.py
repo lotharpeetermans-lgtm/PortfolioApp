@@ -21,8 +21,15 @@ def haal_fundamentals_op(ticker):
             "peg": metrics.get("pegAnnual"),
             "roe": metrics.get("roeRfy"),
             "net_margin": metrics.get("netMarginAnnual"),
-            "revenue_growth": metrics.get("revenueGrowth3Y"),
-            "eps_growth": metrics.get("epsGrowth3Y")
+            "revenue_growth": (
+                metrics.get("revenueGrowth3Y")
+                or metrics.get("revenueGrowth5Y")
+            )
+            "eps_growth": (
+                metrics.get("epsGrowth3Y")
+                or metrics.get("epsGrowth5Y")
+                or metrics.get("epsGrowthQuarterlyYoy")
+            )
         }
 
     except Exception as e:
