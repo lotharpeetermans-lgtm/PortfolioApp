@@ -16,7 +16,8 @@ from transactions import (
     verwijder_transactie
 )
 
-from finnhub_client import finnhub_client
+from finnhub_client import haal_fundamentals_op
+fundamentals = haal_fundamentals_op(ticker)
 
 st.write(
     finnhub_client.company_profile2(
