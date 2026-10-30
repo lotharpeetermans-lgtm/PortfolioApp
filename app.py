@@ -364,9 +364,22 @@ def bereken_fundamentele_score(data):
     revenue_growth = data.get("revenue_growth")
     eps_growth = data.get("eps_growth")
 
+    # PE
+
+    if pe is not None:
+
+        if pe < 15:
+            score += 10
+
+        elif pe < 25:
+            score += 5
+
+        elif pe > 100:
+            score -= 10
+
     # PEG
 
-    if peg:
+    if peg is not None:
 
         if peg < 1:
             score += 15
@@ -374,9 +387,12 @@ def bereken_fundamentele_score(data):
         elif peg < 2:
             score += 10
 
+        elif peg < 3:
+            score += 5
+
     # ROE
 
-    if roe:
+    if roe is not None:
 
         if roe > 20:
             score += 15
@@ -384,9 +400,12 @@ def bereken_fundamentele_score(data):
         elif roe > 10:
             score += 10
 
-    # Omzetgroei
+        elif roe > 5:
+            score += 5
 
-    if revenue_growth:
+    # Revenue Growth
+
+    if revenue_growth is not None:
 
         if revenue_growth > 20:
             score += 10
@@ -394,9 +413,9 @@ def bereken_fundamentele_score(data):
         elif revenue_growth > 10:
             score += 5
 
-    # Winstgroei
+    # EPS Growth
 
-    if eps_growth:
+    if eps_growth is not None:
 
         if eps_growth > 20:
             score += 10
@@ -405,6 +424,7 @@ def bereken_fundamentele_score(data):
             score += 5
 
     return score
+
 
 def bereken_beyond_score(
     ticker
@@ -503,21 +523,25 @@ def bereken_beyond_score(
             fundamenteel
         )
 
-        if totaal >= 80:
+        if totaal >= 100:
 
-            label = "🔥 Top koopkans"
+            label = "🚀 Uitzonderlijk"
 
-        elif totaal >= 65:
+        elif totaal >= 85:
 
-            label = "✅ Koopwaardig"
+    label = "🔥 Top koopkans"
 
-        elif totaal >= 50:
+        elif totaal >= 70:
 
-            label = "👀 Interessant"
+    label = "✅ Koopwaardig"
+
+        elif totaal >= 55:
+
+    label = "👀 Interessant"
 
         else:
 
-            label = "⚠️ Opvolgen"
+    label = "⚠️ Opvolgen"
 
         return {
 
