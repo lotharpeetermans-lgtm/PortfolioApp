@@ -24,7 +24,7 @@ def haal_fundamentals_op(ticker):
             "revenue_growth": (
                 metrics.get("revenueGrowth3Y")
                 or metrics.get("revenueGrowth5Y")
-            )
+            ),
             "eps_growth": (
                 metrics.get("epsGrowth3Y")
                 or metrics.get("epsGrowth5Y")
