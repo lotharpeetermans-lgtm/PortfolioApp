@@ -575,7 +575,7 @@ def bereken_beyond_score(
 
             label = "⚠️ Opvolgen"
 
-       return {
+        return {
 
             "Ticker": ticker,
 
