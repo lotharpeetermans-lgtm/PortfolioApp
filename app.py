@@ -425,6 +425,41 @@ def bereken_fundamentele_score(data):
 
     return score
 
+def trend_label(score):
+
+    if score >= 25:
+        return "🟢 Sterk"
+
+    elif score >= 15:
+        return "🟡 Gemiddeld"
+
+    return "🔴 Zwak"
+
+
+def momentum_label(score):
+
+    if score >= 20:
+        return "🟢 Sterk"
+
+    elif score >= 10:
+        return "🟡 Gemiddeld"
+
+    return "🔴 Zwak"
+
+
+def kwaliteit_label(score):
+
+    if score >= 40:
+        return "🟢 Uitstekend"
+
+    elif score >= 25:
+        return "🟢 Sterk"
+
+    elif score >= 10:
+        return "🟡 Gemiddeld"
+
+    return "🔴 Zwak"
+
 
 def bereken_beyond_score(
     ticker
@@ -540,23 +575,41 @@ def bereken_beyond_score(
 
             label = "⚠️ Opvolgen"
 
-        return {
+       return {
 
             "Ticker": ticker,
 
-            "Beyond Score": totaal,
+            "Beyond Score": round(totaal),
 
-            "Label": label,
+            "Advies": label,
 
-            "Trend": trend,
+            "Trend": trend_label(
+                trend
+            ),
 
-            "Momentum": momentum,
+            "Momentum": momentum_label(
+                momentum
+            ),
 
-            "Sterkte": sterkte,
+            "Fundamentele kwaliteit": kwaliteit_label(
+                fundamenteel
+            ),
 
-            "Terugval": terugval,
+            "Koers": round(
+                koers,
+                2
+            ),
 
-            "Funda Score": fundamenteel,
+            # Details voor later
+            "Trend Score": trend,
+
+            "Momentum Score": momentum,
+
+            "Sterkte Score": sterkte,
+        
+            "Terugval Score": terugval,
+
+            "Fundamentele Score": fundamenteel,
 
             "PE": fundamentals.get("pe"),
 
@@ -564,13 +617,12 @@ def bereken_beyond_score(
 
             "ROE": fundamentals.get("roe"),
 
-            "Revenue Growth": fundamentals.get("revenue_growth"),
+            "Revenue Growth": fundamentals.get(
+                "revenue_growth"
+            ),
 
-            "EPS Growth": fundamentals.get("eps_growth"),
-
-            "Koers": round(
-                koers,
-                2
+            "EPS Growth": fundamentals.get(
+                "eps_growth"
             ),
 
             "6M Rendement": round(
@@ -1025,23 +1077,11 @@ with tab5:
                 [
                     "Ticker",
                     "Beyond Score",
-                    "Label",
+                    "Advies",
                     "Trend",
                     "Momentum",
-                    "Sterkte",
-                    "Terugval",
-                    "Funda Score",
-                    "PE",
-                    "PEG",
-                    "ROE",
-                    "Revenue Growth",
-                    "EPS Growth",
-                    "Koers",
-                    "6M Rendement",
-                    "12M Rendement",
-                    "52W Hoog",
-                    "52W Laag",
-                    "Afstand tot Hoog",
+                    "Fundamentele kwaliteit",
+                    "Koers"
                 ]
             ],
             hide_index=True,
