@@ -174,8 +174,7 @@ st.caption(
 # WERELDWIJDE KOOPKANSEN
 # ===================================
 
-wereld_tickers = [
-
+stock_tickers = [
     # Mega Caps
     "MSFT", "AAPL", "NVDA", "GOOGL", "AMZN",
     "META", "TSLA", "AVGO", "LLY",
@@ -210,21 +209,18 @@ wereld_tickers = [
     # Europa
     "SAP", "SIE.DE",
     "MC.PA", "RMS.PA",
-    "OR.PA", "AIR.PA",
+    "OR.PA", "AIR.PA"
+]
 
-    # ETF's
+etf_tickers = [
     "SPY", "VOO", "QQQ", "VTI",
     "SCHD", "DGRO", "VIG",
     "XLK", "XLF", "XLE",
     "SOXX", "SMH",
-
-    # Wereld ETF's
     "IWDA.AS",
     "VWCE.DE",
     "VWRL.AS",
     "EUNL.DE",
-
-    # Dividend
     "VHYL.AS",
     "HDV",
     "DVY",
@@ -659,13 +655,14 @@ def bereken_beyond_score(
     ttl=3600,
     show_spinner="Wereldwijde koopkansen berekenen..."
 )
-def bereken_wereldwijde_koopkansen(
+def bereken_koopkansen(
+    tickers,
     refresh_key=0
 ):
 
     resultaten = []
 
-    for ticker in wereld_tickers:
+    for ticker in tickers:
 
         resultaat = (
             bereken_beyond_score(
@@ -1048,158 +1045,303 @@ with tab4:
 
 with tab5:
 
-    st.subheader(
-        "🏆 Beste Koopkansen Wereldwijd"
+    aandelen_koopkansen = bereken_koopkansen(
+        stock_tickers,
+        st.session_state.koopkansen_refresh
     )
 
-    wereld_koopkansen = (
-        bereken_wereldwijde_koopkansen(
-            st.session_state.koopkansen_refresh
-        )
+    etf_koopkansen = bereken_koopkansen(
+        etf_tickers,
+        st.session_state.koopkansen_refresh
     )
 
-    if wereld_koopkansen.empty:
+    subtab1, subtab2 = st.tabs(
+        [
+            "📈 Aandelen",
+            "📊 ETF's"
+        ]
+    )
 
-        st.info(
-            "Geen koopkansen gevonden."
-        )
+    # ==========================
+    # AANDELEN
+    # ==========================
 
-    else:
-
-        st.metric(
-            "Aantal gescreende aandelen/ETF's",
-            len(wereld_koopkansen)
-        )
-
-        st.divider()
-
-        st.dataframe(
-            wereld_koopkansen[
-                [
-                    "Ticker",
-                    "Beyond Score",
-                    "Advies",
-                    "Trend",
-                    "Momentum",
-                    "Fundamentele kwaliteit",
-                    "Koers"
-                ]
-            ],
-            hide_index=True,
-            use_container_width=True
-        )
-
-        st.divider()
+    with subtab1:
 
         st.subheader(
-            "🔥 Top 10 Koopkansen"
+            "🏆 Beste Aandelen Wereldwijd"
         )
 
-        st.dataframe(
-            wereld_koopkansen[
-                [
-                    "Ticker",
-                    "Beyond Score",
-                    "Advies"
-                ]
-            ].head(10),
-            hide_index=True,
-            use_container_width=True
-        )
+        if aandelen_koopkansen.empty:
 
-        st.divider()
+            st.info(
+                "Geen aandelen gevonden."
+            )
+
+        else:
+
+            st.metric(
+                "Aantal gescreende aandelen",
+                len(aandelen_koopkansen)
+            )
+
+            st.divider()
+
+            st.dataframe(
+                aandelen_koopkansen[
+                    [
+                        "Ticker",
+                        "Beyond Score",
+                        "Advies",
+                        "Trend",
+                        "Momentum",
+                        "Fundamentele kwaliteit",
+                        "Koers"
+                    ]
+                ],
+                hide_index=True,
+                use_container_width=True
+            )
+
+            st.divider()
+
+            st.subheader(
+                "🔥 Top 10 Koopkansen"
+            )
+
+            st.dataframe(
+                aandelen_koopkansen[
+                    [
+                        "Ticker",
+                        "Beyond Score",
+                        "Advies"
+                    ]
+                ].head(10),
+                hide_index=True,
+                use_container_width=True
+            )
+
+            st.divider()
+
+            st.subheader(
+                "🔍 Detailanalyse"
+            )
+
+            gekozen_ticker = st.selectbox(
+                "Kies een aandeel",
+                aandelen_koopkansen["Ticker"],
+                key="aandeel_select"
+            )
+
+            details = aandelen_koopkansen[
+                aandelen_koopkansen["Ticker"]
+                == gekozen_ticker
+            ].iloc[0]
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            col1.metric(
+                "Beyond Score",
+                details["Beyond Score"]
+            )
+
+            col2.metric(
+                "Koers",
+                f"€ {details['Koers']:.2f}"
+            )
+
+            col3.metric(
+                "Trend",
+                details["Trend"]
+            )
+
+            col4.metric(
+                "Momentum",
+                details["Momentum"]
+            )
+
+            st.info(
+                f"🏢 Fundamentele kwaliteit: "
+                f"{details['Fundamentele kwaliteit']}"
+            )
+
+            with st.expander(
+                "📊 Toon technische en fundamentele details"
+            ):
+
+                st.write(
+                    f"PE: {details['PE']}"
+                )
+
+                st.write(
+                    f"PEG: {details['PEG']}"
+                )
+
+                st.write(
+                    f"ROE: {details['ROE']}"
+                )
+
+                st.write(
+                    f"Omzetgroei: "
+                    f"{details['Revenue Growth']}%"
+                )
+
+                st.write(
+                    f"Winstgroei: "
+                    f"{details['EPS Growth']}%"
+                )
+
+                st.write(
+                    f"6M rendement: "
+                    f"{details['6M Rendement']}%"
+                )
+
+                st.write(
+                    f"12M rendement: "
+                    f"{details['12M Rendement']}%"
+                )
+
+                st.write(
+                    f"52W Hoog: "
+                    f"{details['52W Hoog']}"
+                )
+
+                st.write(
+                    f"52W Laag: "
+                    f"{details['52W Laag']}"
+                )
+
+                st.write(
+                    f"Afstand tot 52W hoog: "
+                    f"{details['Afstand tot Hoog']}%"
+                )
+
+    # ==========================
+    # ETF'S
+    # ==========================
+
+    with subtab2:
 
         st.subheader(
-            "🔍 Detailanalyse"
+            "🏆 Beste ETF's Wereldwijd"
         )
 
-        gekozen_ticker = st.selectbox(
-            "Kies een aandeel",
-            wereld_koopkansen["Ticker"]
-        )
+        if etf_koopkansen.empty:
 
-        details = wereld_koopkansen[
-            wereld_koopkansen["Ticker"]
-            == gekozen_ticker
-        ].iloc[0]
-
-        col1, col2, col3, col4 = st.columns(4)
-
-        col1.metric(
-            "Beyond Score",
-            details["Beyond Score"]
-        )
-
-        col2.metric(
-            "Koers",
-            f"€ {details['Koers']:.2f}"
-        )
-
-        col3.metric(
-            "Trend",
-            details["Trend"]
-        )
-
-        col4.metric(
-            "Momentum",
-            details["Momentum"]
-        )
-
-        st.info(
-            f"🏢 Fundamentele kwaliteit: "
-            f"{details['Fundamentele kwaliteit']}"
-        )
-
-        with st.expander(
-            "📊 Toon technische en fundamentele details"
-        ):
-
-            st.write(
-                f"PE: {details['PE']}"
+            st.info(
+                "Geen ETF's gevonden."
             )
 
-            st.write(
-                f"PEG: {details['PEG']}"
+        else:
+
+            st.metric(
+                "Aantal gescreende ETF's",
+                len(etf_koopkansen)
             )
 
-            st.write(
-                f"ROE: {details['ROE']}"
+            st.divider()
+
+            st.dataframe(
+                etf_koopkansen[
+                    [
+                        "Ticker",
+                        "Beyond Score",
+                        "Advies",
+                        "Trend",
+                        "Momentum",
+                        "Fundamentele kwaliteit",
+                        "Koers"
+                    ]
+                ],
+                hide_index=True,
+                use_container_width=True
             )
 
-            st.write(
-                f"Omzetgroei: "
-                f"{details['Revenue Growth']}%"
+            st.divider()
+
+            st.subheader(
+                "🔥 Top 10 ETF's"
             )
 
-            st.write(
-                f"Winstgroei: "
-                f"{details['EPS Growth']}%"
+            st.dataframe(
+                etf_koopkansen[
+                    [
+                        "Ticker",
+                        "Beyond Score",
+                        "Advies"
+                    ]
+                ].head(10),
+                hide_index=True,
+                use_container_width=True
             )
 
-            st.write(
-                f"6M rendement: "
-                f"{details['6M Rendement']}%"
+            st.divider()
+
+            st.subheader(
+                "🔍 Detailanalyse ETF"
             )
 
-            st.write(
-                f"12M rendement: "
-                f"{details['12M Rendement']}%"
+            gekozen_etf = st.selectbox(
+                "Kies een ETF",
+                etf_koopkansen["Ticker"],
+                key="etf_select"
             )
 
-            st.write(
-                f"52W Hoog: "
-                f"{details['52W Hoog']}"
+            details = etf_koopkansen[
+                etf_koopkansen["Ticker"]
+                == gekozen_etf
+            ].iloc[0]
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            col1.metric(
+                "Beyond Score",
+                details["Beyond Score"]
             )
 
-            st.write(
-                f"52W Laag: "
-                f"{details['52W Laag']}"
+            col2.metric(
+                "Koers",
+                f"€ {details['Koers']:.2f}"
             )
 
-            st.write(
-                f"Afstand tot 52W hoog: "
-                f"{details['Afstand tot Hoog']}%"
+            col3.metric(
+                "Trend",
+                details["Trend"]
             )
+
+            col4.metric(
+                "Momentum",
+                details["Momentum"]
+            )
+
+            with st.expander(
+                "📊 Toon technische details"
+            ):
+
+                st.write(
+                    f"6M rendement: "
+                    f"{details['6M Rendement']}%"
+                )
+
+                st.write(
+                    f"12M rendement: "
+                    f"{details['12M Rendement']}%"
+                )
+
+                st.write(
+                    f"52W Hoog: "
+                    f"{details['52W Hoog']}"
+                )
+
+                st.write(
+                    f"52W Laag: "
+                    f"{details['52W Laag']}"
+                )
+
+                st.write(
+                    f"Afstand tot 52W hoog: "
+                    f"{details['Afstand tot Hoog']}%"
+                )
 
 # ===================================
 # TAB 6 - INSTELLINGEN
