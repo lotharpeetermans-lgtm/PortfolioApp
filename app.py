@@ -191,6 +191,10 @@ from universum import STOCK_TICKERS, ETF_TICKERS
 stock_tickers = STOCK_TICKERS
 etf_tickers = ETF_TICKERS
 
+ETF_TICKERS_SET = set(
+    ETF_TICKERS
+)
+
 def bereken_trend_score(
     koers,
     hist
@@ -645,17 +649,58 @@ def bereken_beyond_score(
     except Exception:
 
         return None
-
 @st.cache_data(
     ttl=21600,
-    show_spinner="400 effecten aan het screenen..."
+    show_spinner="Wereldwijde koopkansen berekenen..."
 )
 def bereken_koopkansen(
     tickers,
     refresh_key=0
 ):
 
-    voorlopige_lijst = []
+    resultaten = []
+
+    data = download_marktdata(
+        tuple(tickers)
+    )
+
+    for ticker in tickers:
+
+        try:
+
+            hist = data[ticker]
+
+            resultaat = (
+                bereken_beyond_score(
+                    ticker,
+                    hist
+                )
+            )
+
+            if resultaat:
+
+                resultaten.append(
+                    resultaat
+                )
+
+        except Exception:
+
+            continue
+
+    if not resultaten:
+
+        return pd.DataFrame()
+
+    return (
+        pd.DataFrame(
+            resultaten
+        )
+        .sort_values(
+            "Beyond Score",
+            ascending=False
+        )
+    )
+
 
     # ==================================
     # FASE 1
@@ -742,51 +787,7 @@ def bereken_koopkansen(
     if not voorlopige_lijst:
         return pd.DataFrame()
 
-    # ==================================
-    # ENKEL BESTE 200 VERDER
-    # ==================================
-
-    topJa. Voor 400 tickers zou ik meteen naar onderstaande architectuur gaan:
-
-## 1. finnhub_client.py
-
-```python
-import streamlit as st
-import finnhub
-
-finnhub_client = finnhub.Client(
-    api_key=st.secrets["FINNHUB_API_KEY"]
-)
-
-@st.cache_data(ttl=86400)
-def haal_fundamentals_op(ticker):
-
-    try:
-
-        data = finnhub_client.company_basic_financials(
-            ticker,
-            "all"
-        )
-
-        metrics = data.get(
-            "metric",
-            {}
-        )
-
-        return {
-            "pe": metrics.get("peTTM"),
-            "peg": metrics.get("pegAnnual"),
-            "roe": metrics.get("roeTTM"),
-            "revenue_growth": metrics.get(
-                "revenueGrowthTTMYoy"
-            ),
-            "eps_growth": metrics.get(
-                "epsGrowthTTMYoy"
-            )
-        }
-
-    except Exception:
-        return {}
+   
 
 # ===================================
 # TABS
