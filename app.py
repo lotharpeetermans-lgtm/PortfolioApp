@@ -1041,12 +1041,13 @@ with tab4:
         st.bar_chart(
             grafiek_df["Rendement %"]
         )
+
 # ===================================
 # TAB 5 - KOOPKANSEN
 # ===================================
 
 with tab5:
-    
+
     st.subheader(
         "🏆 Beste Koopkansen Wereldwijd"
     )
@@ -1093,18 +1094,9 @@ with tab5:
         st.subheader(
             "🔥 Top 10 Koopkansen"
         )
-        
+
         st.dataframe(
-            wereld_koopkansen[
-                [
-                    "Ticker",
-                    "Beyond Score",
-                    "Label"
-                ]
-            ].head(10),
-            hide_index=True,
-            use_container_width=True
-        )
+            wereld_koopkansen
 
 # ===================================
 # TAB 6 - INSTELLINGEN
