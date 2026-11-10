@@ -174,58 +174,10 @@ st.caption(
 # WERELDWIJDE KOOPKANSEN
 # ===================================
 
-stock_tickers = [
-    # Mega Caps
-    "MSFT", "AAPL", "NVDA", "GOOGL", "AMZN",
-    "META", "TSLA", "AVGO", "LLY",
+from universum import STOCK_TICKERS, ETF_TICKERS
 
-    # Technologie
-    "AMD", "QCOM", "INTC", "CRM", "ADBE",
-    "NOW", "PLTR", "SNOW", "UBER", "SHOP",
-
-    # Chips
-    "ASML", "TSM", "AMAT", "LRCX", "MU",
-    "KLAC", "NXPI", "ON", "MRVL",
-
-    # Financieel
-    "V", "MA", "JPM", "BAC", "GS",
-    "MS", "BLK", "SCHW", "AXP",
-
-    # Gezondheidszorg
-    "JNJ", "ABBV", "MRK", "PFE",
-    "ABT", "ISRG", "TMO", "DHR",
-
-    # Industrie
-    "CAT", "GE", "HON", "DE",
-    "RTX", "LMT", "ETN", "PH",
-
-    # Consument
-    "PG", "KO", "PEP", "MCD",
-    "HD", "COST", "NKE", "SBUX",
-
-    # Energie
-    "XOM", "CVX", "SLB", "COP",
-
-    # Europa
-    "SAP", "SIE.DE",
-    "MC.PA", "RMS.PA",
-    "OR.PA", "AIR.PA"
-]
-
-etf_tickers = [
-    "SPY", "VOO", "QQQ", "VTI",
-    "SCHD", "DGRO", "VIG",
-    "XLK", "XLF", "XLE",
-    "SOXX", "SMH",
-    "IWDA.AS",
-    "VWCE.DE",
-    "VWRL.AS",
-    "EUNL.DE",
-    "VHYL.AS",
-    "HDV",
-    "DVY",
-    "NOBL"
-]
+stock_tickers = STOCK_TICKERS
+etf_tickers = ETF_TICKERS
 
 def bereken_trend_score(
     koers,
