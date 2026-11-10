@@ -1,15 +1,14 @@
-import finnhub
 import streamlit as st
+import finnhub
 
 finnhub_client = finnhub.Client(
     api_key=st.secrets["FINNHUB_API_KEY"]
 )
 
-
+@st.cache_data(ttl=86400)
 def haal_fundamentals_op(ticker):
 
     try:
-
         data = finnhub_client.company_basic_financials(
             ticker,
             "all"
@@ -17,47 +16,13 @@ def haal_fundamentals_op(ticker):
 
         metrics = data.get("metric", {})
 
-        pe = metrics.get("peNormalizedAnnual")
-
-        revenue_growth = (
-            metrics.get("revenueGrowth3Y")
-            or metrics.get("revenueGrowth5Y")
-        )
-
-        eps_growth = (
-            metrics.get("epsGrowth3Y")
-            or metrics.get("epsGrowth5Y")
-            or metrics.get("epsGrowthQuarterlyYoy")
-        )
-
-        roe = metrics.get("roeRfy")
-
-        net_margin = metrics.get("netMarginAnnual")
-
-        # Eigen PEG-berekening
-        peg = None
-
-        if (
-            pe is not None
-            and eps_growth is not None
-            and eps_growth > 0
-        ):
-            peg = round(
-                pe / eps_growth,
-                2
-            )
-
         return {
-            "pe": pe,
-            "peg": peg,
-            "roe": roe,
-            "net_margin": net_margin,
-            "revenue_growth": revenue_growth,
-            "eps_growth": eps_growth
+            "pe": metrics.get("peTTM"),
+            "peg": metrics.get("pegAnnual"),
+            "roe": metrics.get("roeTTM"),
+            "revenue_growth": metrics.get("revenueGrowthTTMYoy"),
+            "eps_growth": metrics.get("epsGrowthTTMYoy")
         }
 
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    except:
+        return {}
