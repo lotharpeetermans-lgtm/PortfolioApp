@@ -1096,7 +1096,110 @@ with tab5:
         )
 
         st.dataframe(
-            wereld_koopkansen
+            wereld_koopkansen[
+                [
+                    "Ticker",
+                    "Beyond Score",
+                    "Advies"
+                ]
+            ].head(10),
+            hide_index=True,
+            use_container_width=True
+        )
+
+        st.divider()
+
+        st.subheader(
+            "🔍 Detailanalyse"
+        )
+
+        gekozen_ticker = st.selectbox(
+            "Kies een aandeel",
+            wereld_koopkansen["Ticker"]
+        )
+
+        details = wereld_koopkansen[
+            wereld_koopkansen["Ticker"]
+            == gekozen_ticker
+        ].iloc[0]
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric(
+            "Beyond Score",
+            details["Beyond Score"]
+        )
+
+        col2.metric(
+            "Koers",
+            f"€ {details['Koers']:.2f}"
+        )
+
+        col3.metric(
+            "Trend",
+            details["Trend"]
+        )
+
+        col4.metric(
+            "Momentum",
+            details["Momentum"]
+        )
+
+        st.info(
+            f"🏢 Fundamentele kwaliteit: "
+            f"{details['Fundamentele kwaliteit']}"
+        )
+
+        with st.expander(
+            "📊 Toon technische en fundamentele details"
+        ):
+
+            st.write(
+                f"PE: {details['PE']}"
+            )
+
+            st.write(
+                f"PEG: {details['PEG']}"
+            )
+
+            st.write(
+                f"ROE: {details['ROE']}"
+            )
+
+            st.write(
+                f"Omzetgroei: "
+                f"{details['Revenue Growth']}%"
+            )
+
+            st.write(
+                f"Winstgroei: "
+                f"{details['EPS Growth']}%"
+            )
+
+            st.write(
+                f"6M rendement: "
+                f"{details['6M Rendement']}%"
+            )
+
+            st.write(
+                f"12M rendement: "
+                f"{details['12M Rendement']}%"
+            )
+
+            st.write(
+                f"52W Hoog: "
+                f"{details['52W Hoog']}"
+            )
+
+            st.write(
+                f"52W Laag: "
+                f"{details['52W Laag']}"
+            )
+
+            st.write(
+                f"Afstand tot 52W hoog: "
+                f"{details['Afstand tot Hoog']}%"
+            )
 
 # ===================================
 # TAB 6 - INSTELLINGEN
