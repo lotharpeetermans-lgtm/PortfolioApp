@@ -18,6 +18,18 @@ from transactions import (
 
 from finnhub_client import haal_fundamentals_op
 
+from universum import (
+    STOCK_TICKERS,
+    ETF_TICKERS
+)
+
+stock_tickers = STOCK_TICKERS
+etf_tickers = ETF_TICKERS
+
+ETF_TICKERS_SET = set(
+    ETF_TICKERS
+)
+
 def score_range(
     waarde,
     grens1,
@@ -249,8 +261,6 @@ def bereken_momentum_score(
 
     return score
 
-
-
 def bereken_relatieve_sterkte_score(
     koers,
     hist
@@ -408,50 +418,55 @@ def kwaliteit_label(score):
 
     return "🔴 Zwak"
 
+@st.cache_data(
+    ttl=3600
+)
+def download_marktdata(
+    tickers
+):
+
+    return yf.download(
+        tickers=tickers,
+        period="1y",
+        auto_adjust=True,
+        group_by="ticker",
+        progress=False,
+        threads=True
+    )
 
 def bereken_beyond_score(
-    ticker
+    ticker,
+    hist
 ):
 
     try:
 
-        aandeel = yf.Ticker(ticker)
-
-        hist = aandeel.history(
-            period="1y"
-        )
-
         if hist.empty:
+            return None
+
+        if len(hist) < 126:
             return None
 
         koers = float(
             hist["Close"].iloc[-1]
         )
 
-        fundamentals = haal_fundamentals_op(
-            ticker
+        jaarhoog = float(
+            hist["High"].max()
         )
 
-        fundamenteel = bereken_fundamentele_score(
-            fundamentals
+        jaarlaag = float(
+            hist["Low"].min()
         )
 
-        jaarhoog = (
-            hist["High"]
-            .max()
+        koers_6m = float(
+            hist["Close"].iloc[-126]
         )
 
-        jaarlaag = (
-            hist["Low"]
-            .min()
+        koers_12m = float(
+            hist["Close"].iloc[0]
         )
 
-        if len(hist) < 126:
-            return None
-
-        koers_6m = hist["Close"].iloc[-126]
-        koers_12m = hist["Close"].iloc[0]
-        
         rendement_6m = (
             (koers - koers_6m)
             / koers_6m
@@ -467,19 +482,15 @@ def bereken_beyond_score(
             / jaarhoog
         ) * 100
 
-        trend = (
-            bereken_trend_score(
-                koers,
-                hist
-            )
+        trend = bereken_trend_score(
+            koers,
+            hist
         )
 
-        momentum = (
-            bereken_momentum_score(
-                rendement_6m,
-                rendement_12m
-            )
-        )        
+        momentum = bereken_momentum_score(
+            rendement_6m,
+            rendement_12m
+        )
 
         sterkte = (
             bereken_relatieve_sterkte_score(
@@ -495,152 +506,287 @@ def bereken_beyond_score(
             )
         )
 
-        totaal = (
-            trend +
-            momentum +
-            sterkte +
-            terugval +
-            fundamenteel
-        )
+        if ticker in ETF_TICKERS_SET:
 
-        if totaal >= 100:
+            fundamentals = {}
 
-            label = "🚀 Uitzonderlijk"
-
-        elif totaal >= 85:
-
-            label = "🔥 Top koopkans"
-
-        elif totaal >= 70:
-
-            label = "✅ Koopwaardig"
-
-        elif totaal >= 55:
-
-            label = "👀 Interessant"
+            fundamenteel = 0
 
         else:
 
+            fundamentals = (
+                haal_fundamentals_op(
+                    ticker
+                )
+            )
+
+            fundamenteel = (
+                bereken_fundamentele_score(
+                    fundamentals
+                )
+            )
+
+        totaal = (
+            trend
+            + momentum
+            + sterkte
+            + terugval
+            + fundamenteel
+        )
+
+        if totaal >= 100:
+            label = "🚀 Uitzonderlijk"
+
+        elif totaal >= 85:
+            label = "🔥 Top koopkans"
+
+        elif totaal >= 70:
+            label = "✅ Koopwaardig"
+
+        elif totaal >= 55:
+            label = "👀 Interessant"
+
+        else:
             label = "⚠️ Opvolgen"
 
         return {
 
             "Ticker": ticker,
 
-            "Beyond Score": round(totaal),
+            "Beyond Score":
+                round(totaal),
 
-            "Advies": label,
+            "Advies":
+                label,
 
-            "Trend": trend_label(
-                trend
-            ),
+            "Trend":
+                trend_label(trend),
 
-            "Momentum": momentum_label(
-                momentum
-            ),
+            "Momentum":
+                momentum_label(momentum),
 
-            "Fundamentele kwaliteit": kwaliteit_label(
-                fundamenteel
-            ),
+            "Fundamentele kwaliteit":
+                kwaliteit_label(
+                    fundamenteel
+                ),
 
-            "Koers": round(
-                koers,
-                2
-            ),
+            "Koers":
+                round(
+                    koers,
+                    2
+                ),
 
-            # Details voor later
-            "Trend Score": trend,
+            "Trend Score":
+                trend,
 
-            "Momentum Score": momentum,
+            "Momentum Score":
+                momentum,
 
-            "Sterkte Score": sterkte,
-        
-            "Terugval Score": terugval,
+            "Sterkte Score":
+                sterkte,
 
-            "Fundamentele Score": fundamenteel,
+            "Terugval Score":
+                terugval,
 
-            "PE": fundamentals.get("pe"),
+            "Fundamentele Score":
+                fundamenteel,
 
-            "PEG": fundamentals.get("peg"),
+            "PE":
+                fundamentals.get("pe"),
 
-            "ROE": fundamentals.get("roe"),
+            "PEG":
+                fundamentals.get("peg"),
 
-            "Revenue Growth": fundamentals.get(
-                "revenue_growth"
-            ),
+            "ROE":
+                fundamentals.get("roe"),
 
-            "EPS Growth": fundamentals.get(
-                "eps_growth"
-            ),
+            "Revenue Growth":
+                fundamentals.get(
+                    "revenue_growth"
+                ),
 
-            "6M Rendement": round(
-                rendement_6m,
-                2
-            ),
+            "EPS Growth":
+                fundamentals.get(
+                    "eps_growth"
+                ),
 
-            "12M Rendement": round(
-                rendement_12m,
-                2
-            ),
+            "6M Rendement":
+                round(
+                    rendement_6m,
+                    2
+                ),
 
-            "52W Hoog": round(
-                jaarhoog,
-                2
-            ),
+            "12M Rendement":
+                round(
+                    rendement_12m,
+                    2
+                ),
 
-            "52W Laag": round(
-                jaarlaag,
-                2
-            ),
+            "52W Hoog":
+                round(
+                    jaarhoog,
+                    2
+                ),
 
-            "Afstand tot Hoog": round(
-                afstand_tot_hoog,
-                2
-            )
+            "52W Laag":
+                round(
+                    jaarlaag,
+                    2
+                ),
+
+            "Afstand tot Hoog":
+                round(
+                    afstand_tot_hoog,
+                    2
+                )
+
         }
 
-    except Exception as e:
-        st.error(f"{ticker}: {e}")
+    except Exception:
+
         return None
 
 @st.cache_data(
-    ttl=3600,
-    show_spinner="Wereldwijde koopkansen berekenen..."
+    ttl=21600,
+    show_spinner="400 effecten aan het screenen..."
 )
 def bereken_koopkansen(
     tickers,
     refresh_key=0
 ):
 
-    resultaten = []
+    voorlopige_lijst = []
+
+    # ==================================
+    # FASE 1
+    # TECHNISCHE SCORE
+    # ==================================
 
     for ticker in tickers:
 
-        resultaat = (
-            bereken_beyond_score(
-                ticker
-            )
-        )
+        try:
 
-        if resultaat:
+            aandeel = yf.Ticker(ticker)
 
-            resultaten.append(
-                resultaat
+            hist = aandeel.history(
+                period="1y"
             )
 
-    if not resultaten:
+            if hist.empty:
+                continue
 
+            if len(hist) < 126:
+                continue
+
+            koers = float(
+                hist["Close"].iloc[-1]
+            )
+
+            koers_6m = hist["Close"].iloc[-126]
+            koers_12m = hist["Close"].iloc[0]
+
+            rendement_6m = (
+                (koers - koers_6m)
+                / koers_6m
+            ) * 100
+
+            rendement_12m = (
+                (koers - koers_12m)
+                / koers_12m
+            ) * 100
+
+            trend = bereken_trend_score(
+                koers,
+                hist
+            )
+
+            momentum = (
+                bereken_momentum_score(
+                    rendement_6m,
+                    rendement_12m
+                )
+            )
+
+            sterkte = (
+                bereken_relatieve_sterkte_score(
+                    koers,
+                    hist
+                )
+            )
+
+            terugval = (
+                bereken_terugval_score(
+                    koers,
+                    hist
+                )
+            )
+
+            technische_score = (
+                trend +
+                momentum +
+                sterkte +
+                terugval
+            )
+
+            voorlopige_lijst.append(
+                {
+                    "Ticker": ticker,
+                    "Technische Score":
+                        technische_score
+                }
+            )
+
+        except:
+            pass
+
+    if not voorlopige_lijst:
         return pd.DataFrame()
 
-    return (
-        pd.DataFrame(
-            resultaten
+    # ==================================
+    # ENKEL BESTE 200 VERDER
+    # ==================================
+
+    topJa. Voor 400 tickers zou ik meteen naar onderstaande architectuur gaan:
+
+## 1. finnhub_client.py
+
+```python
+import streamlit as st
+import finnhub
+
+finnhub_client = finnhub.Client(
+    api_key=st.secrets["FINNHUB_API_KEY"]
+)
+
+@st.cache_data(ttl=86400)
+def haal_fundamentals_op(ticker):
+
+    try:
+
+        data = finnhub_client.company_basic_financials(
+            ticker,
+            "all"
         )
-        .sort_values(
-            "Beyond Score",
-            ascending=False
+
+        metrics = data.get(
+            "metric",
+            {}
         )
-    )
+
+        return {
+            "pe": metrics.get("peTTM"),
+            "peg": metrics.get("pegAnnual"),
+            "roe": metrics.get("roeTTM"),
+            "revenue_growth": metrics.get(
+                "revenueGrowthTTMYoy"
+            ),
+            "eps_growth": metrics.get(
+                "epsGrowthTTMYoy"
+            )
+        }
+
+    except Exception:
+        return {}
 
 # ===================================
 # TABS
