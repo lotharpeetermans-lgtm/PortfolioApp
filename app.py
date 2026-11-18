@@ -1266,36 +1266,44 @@ with tab5:
                     ("Omzetgroei", details["Revenue Growth"]),
                     ("Winstgroei", details["EPS Growth"])
                 ]
-
+            
+                st.markdown("### Fundamentele gegevens")
+            
                 for naam, waarde in velden:
-
+            
                     if not pd.isna(waarde):
-
+            
                         st.write(
-                            f"6M rendement: "
-                            f"{details['6M Rendement']}%"
+                            f"{naam}: {round(waarde, 2)}"
                         )
-                    
-                        st.write(
-                            f"12M rendement: "
-                            f"{details['12M Rendement']}%"
-                        )
-                    
-                        st.write(
-                            f"52W Hoog: "
-                            f"{details['52W Hoog']}"
-                        )
-                    
-                        st.write(
-                            f"52W Laag: "
-                            f"{details['52W Laag']}"
-                        )
-                    
-                        st.write(
-                            f"Afstand tot 52W hoog: "
-                            f"{details['Afstand tot Hoog']}%"
-                        )
-                        
+            
+                st.markdown("### Technische gegevens")
+            
+                st.write(
+                    f"6M rendement: "
+                    f"{details['6M Rendement']}%"
+                )
+            
+                st.write(
+                    f"12M rendement: "
+                    f"{details['12M Rendement']}%"
+                )
+            
+                st.write(
+                    f"52W Hoog: "
+                    f"{details['52W Hoog']}"
+                )
+            
+                st.write(
+                    f"52W Laag: "
+                    f"{details['52W Laag']}"
+                )
+            
+                st.write(
+                    f"Afstand tot 52W hoog: "
+                    f"{details['Afstand tot Hoog']}%"
+                )
+                                    
     # ==========================
     # ETF'S
     # ==========================
