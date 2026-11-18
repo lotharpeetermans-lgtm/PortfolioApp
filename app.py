@@ -1256,56 +1256,46 @@ with tab5:
                 st.write(reden)
             
             with st.expander(
-                "📊 Toon technische en fundamentele details"
+                "📊 Technische en fundamentele gegevens"
             ):
 
-                st.write(
-                    f"PE: {details['PE']}"
-                )
+                velden = [
+                    ("PE", details["PE"]),
+                    ("PEG", details["PEG"]),
+                    ("ROE", details["ROE"]),
+                    ("Omzetgroei", details["Revenue Growth"]),
+                    ("Winstgroei", details["EPS Growth"])
+                ]
 
-                st.write(
-                    f"PEG: {details['PEG']}"
-                )
+                for naam, waarde in velden:
 
-                st.write(
-                    f"ROE: {details['ROE']}"
-                )
-
-                st.write(
-                    f"Omzetgroei: "
-                    f"{details['Revenue Growth']}%"
-                )
-
-                st.write(
-                    f"Winstgroei: "
-                    f"{details['EPS Growth']}%"
-                )
+                    if not pd.isna(waarde):
 
                 st.write(
                     f"6M rendement: "
                     f"{details['6M Rendement']}%"
                 )
-
+            
                 st.write(
                     f"12M rendement: "
                     f"{details['12M Rendement']}%"
                 )
-
+            
                 st.write(
                     f"52W Hoog: "
                     f"{details['52W Hoog']}"
                 )
-
+            
                 st.write(
                     f"52W Laag: "
                     f"{details['52W Laag']}"
                 )
-
+            
                 st.write(
                     f"Afstand tot 52W hoog: "
                     f"{details['Afstand tot Hoog']}%"
                 )
-
+                        
     # ==========================
     # ETF'S
     # ==========================
