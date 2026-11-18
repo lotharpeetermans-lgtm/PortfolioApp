@@ -1255,8 +1255,6 @@ with tab5:
             for reden in redenen:
                 st.write(reden)
             
-            )
-
             with st.expander(
                 "📊 Toon technische en fundamentele details"
             ):
