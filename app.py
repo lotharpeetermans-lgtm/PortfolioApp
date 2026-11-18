@@ -186,15 +186,6 @@ st.caption(
 # WERELDWIJDE KOOPKANSEN
 # ===================================
 
-from universum import STOCK_TICKERS, ETF_TICKERS
-
-stock_tickers = STOCK_TICKERS
-etf_tickers = ETF_TICKERS
-
-ETF_TICKERS_SET = set(
-    ETF_TICKERS
-)
-
 def bereken_trend_score(
     koers,
     hist
@@ -1235,9 +1226,35 @@ with tab5:
                 details["Momentum"]
             )
 
-            st.info(
-                f"🏢 Fundamentele kwaliteit: "
-                f"{details['Fundamentele kwaliteit']}"
+            st.subheader(
+                "🎯 Waarom staat dit aandeel hier?"
+            )
+
+            redenen = []
+
+            if details["Fundamentele Score"] >= 25:
+                redenen.append(
+                    "✅ Sterke fundamentele kwaliteit"
+            )
+
+            if details["Trend Score"] >= 20:
+                redenen.append(
+                    "✅ Positieve trend"
+            )
+
+            if details["Momentum Score"] >= 15:
+                redenen.append(
+                    "✅ Sterk momentum"
+            )
+
+            if details["Terugval Score"] >= 15:
+                redenen.append(
+                    "✅ Interessante terugval vanaf eerdere toppen"
+            )
+
+            for reden in redenen:
+                st.write(reden)
+            
             )
 
             with st.expander(
