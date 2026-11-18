@@ -1128,9 +1128,9 @@ with tab5:
         ]
     )
 
-    # ==========================
+    # ===================================
     # AANDELEN
-    # ==========================
+    # ===================================
 
     with subtab1:
 
@@ -1165,24 +1165,6 @@ with tab5:
                         "Koers"
                     ]
                 ],
-                hide_index=True,
-                use_container_width=True
-            )
-
-            st.divider()
-
-            st.subheader(
-                "🔥 Top 10 Koopkansen"
-            )
-
-            st.dataframe(
-                aandelen_koopkansen[
-                    [
-                        "Ticker",
-                        "Beyond Score",
-                        "Advies"
-                    ]
-                ].head(10),
                 hide_index=True,
                 use_container_width=True
             )
@@ -1235,29 +1217,54 @@ with tab5:
             if details["Fundamentele Score"] >= 25:
                 redenen.append(
                     "✅ Sterke fundamentele kwaliteit"
-            )
+                )
 
             if details["Trend Score"] >= 20:
                 redenen.append(
                     "✅ Positieve trend"
-            )
+                )
 
             if details["Momentum Score"] >= 15:
                 redenen.append(
                     "✅ Sterk momentum"
-            )
+                )
 
             if details["Terugval Score"] >= 15:
                 redenen.append(
                     "✅ Interessante terugval vanaf eerdere toppen"
-            )
+                )
+
+            if not redenen:
+
+                redenen.append(
+                    "ℹ️ Geen uitgesproken positieve signalen gevonden."
+                )
 
             for reden in redenen:
+
                 st.write(reden)
-            
+
+            analyse = analyse_fundamentals(
+                details
+            )
+
+            if analyse:
+
+                st.subheader(
+                    "📝 Beyond Analyse"
+                )
+
+                for lijn in analyse:
+
+                    st.write(lijn)
+
             with st.expander(
                 "📊 Technische en fundamentele gegevens"
             ):
+
+                st.markdown(
+                    "### Fundamentele gegevens"
+                )
 
                 velden = [
                     ("PE", details["PE"]),
@@ -1266,47 +1273,57 @@ with tab5:
                     ("Omzetgroei", details["Revenue Growth"]),
                     ("Winstgroei", details["EPS Growth"])
                 ]
-            
-                st.markdown("### Fundamentele gegevens")
-            
+
+                fundadata_gevonden = False
+
                 for naam, waarde in velden:
-            
+
                     if not pd.isna(waarde):
-            
+
+                        fundadata_gevonden = True
+
                         st.write(
                             f"{naam}: {round(waarde, 2)}"
                         )
-            
-                st.markdown("### Technische gegevens")
-            
+
+                if not fundadata_gevonden:
+
+                    st.info(
+                        "Geen fundamentele gegevens beschikbaar."
+                    )
+
+                st.markdown(
+                    "### Technische gegevens"
+                )
+
                 st.write(
                     f"6M rendement: "
                     f"{details['6M Rendement']}%"
                 )
-            
+
                 st.write(
                     f"12M rendement: "
                     f"{details['12M Rendement']}%"
                 )
-            
+
                 st.write(
                     f"52W Hoog: "
                     f"{details['52W Hoog']}"
                 )
-            
+
                 st.write(
                     f"52W Laag: "
                     f"{details['52W Laag']}"
                 )
-            
+
                 st.write(
                     f"Afstand tot 52W hoog: "
                     f"{details['Afstand tot Hoog']}%"
                 )
-                                    
-    # ==========================
+
+    # ===================================
     # ETF'S
-    # ==========================
+    # ===================================
 
     with subtab2:
 
@@ -1337,28 +1354,9 @@ with tab5:
                         "Advies",
                         "Trend",
                         "Momentum",
-                        "Fundamentele kwaliteit",
                         "Koers"
                     ]
                 ],
-                hide_index=True,
-                use_container_width=True
-            )
-
-            st.divider()
-
-            st.subheader(
-                "🔥 Top 10 ETF's"
-            )
-
-            st.dataframe(
-                etf_koopkansen[
-                    [
-                        "Ticker",
-                        "Beyond Score",
-                        "Advies"
-                    ]
-                ].head(10),
                 hide_index=True,
                 use_container_width=True
             )
@@ -1403,7 +1401,7 @@ with tab5:
             )
 
             with st.expander(
-                "📊 Toon technische details"
+                "📊 ETF Analyse"
             ):
 
                 st.write(
