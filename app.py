@@ -425,6 +425,71 @@ def kwaliteit_label(score):
 @st.cache_data(
     ttl=3600
 )
+
+def analyse_fundamentals(details):
+
+    analyse = []
+
+    peg = details["PEG"]
+    roe = details["ROE"]
+    revenue = details["Revenue Growth"]
+    eps = details["EPS Growth"]
+
+    if peg is not None:
+
+        if peg < 1:
+            analyse.append(
+                "✅ Aandeel lijkt goedkoop tegenover de verwachte groei."
+            )
+
+        elif peg < 2:
+            analyse.append(
+                "✅ Waardering lijkt redelijk tegenover de groei."
+            )
+
+        else:
+            analyse.append(
+                "⚠️ Groei lijkt duur geprijsd."
+            )
+
+    if roe is not None:
+
+        if roe > 20:
+            analyse.append(
+                "✅ Zeer winstgevend bedrijf."
+            )
+
+        elif roe > 10:
+            analyse.append(
+                "✅ Degelijke rendabiliteit."
+            )
+
+    if revenue is not None:
+
+        if revenue > 15:
+            analyse.append(
+                "✅ Sterke omzetgroei."
+            )
+
+        elif revenue < 0:
+            analyse.append(
+                "⚠️ Dalende omzet."
+            )
+
+    if eps is not None:
+
+        if eps > 20:
+            analyse.append(
+                "✅ Sterke winstgroei."
+            )
+
+        elif eps < 0:
+            analyse.append(
+                "⚠️ Winst daalt."
+            )
+
+    return analyse
+
 def download_marktdata(
     tickers
 ):
