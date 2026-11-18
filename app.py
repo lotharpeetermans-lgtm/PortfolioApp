@@ -1271,30 +1271,30 @@ with tab5:
 
                     if not pd.isna(waarde):
 
-                st.write(
-                    f"6M rendement: "
-                    f"{details['6M Rendement']}%"
-                )
-            
-                st.write(
-                    f"12M rendement: "
-                    f"{details['12M Rendement']}%"
-                )
-            
-                st.write(
-                    f"52W Hoog: "
-                    f"{details['52W Hoog']}"
-                )
-            
-                st.write(
-                    f"52W Laag: "
-                    f"{details['52W Laag']}"
-                )
-            
-                st.write(
-                    f"Afstand tot 52W hoog: "
-                    f"{details['Afstand tot Hoog']}%"
-                )
+                        st.write(
+                            f"6M rendement: "
+                            f"{details['6M Rendement']}%"
+                        )
+                    
+                        st.write(
+                            f"12M rendement: "
+                            f"{details['12M Rendement']}%"
+                        )
+                    
+                        st.write(
+                            f"52W Hoog: "
+                            f"{details['52W Hoog']}"
+                        )
+                    
+                        st.write(
+                            f"52W Laag: "
+                            f"{details['52W Laag']}"
+                        )
+                    
+                        st.write(
+                            f"Afstand tot 52W hoog: "
+                            f"{details['Afstand tot Hoog']}%"
+                        )
                         
     # ==========================
     # ETF'S
